@@ -1,1 +1,3 @@
 nimcache/
+.directory
+src/config.ini
