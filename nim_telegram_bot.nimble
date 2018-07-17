@@ -5,8 +5,8 @@ author        = "Juan Carlos"
 description   = "Telegram Bot for Nim"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["temp"]
+bin           = @["nim_telegram_bot"]
 
 # Dependencies
 
-requires "nim >= 0.18.0"
+requires "nim >= 0.18.0", telebot
