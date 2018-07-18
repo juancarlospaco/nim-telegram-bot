@@ -1,4 +1,4 @@
-import times, asyncdispatch, osproc, ospaths, logging, options, httpclient
+import asyncdispatch, osproc, ospaths, logging, options, httpclient
 import terminal, parsecfg, strutils, strformat, times
 import telebot  # nimble install telebot
 
