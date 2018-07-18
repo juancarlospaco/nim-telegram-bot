@@ -97,11 +97,11 @@ proc main*(): auto =
 
   bot.onUpdate(handleUpdate(bot))
 
+  bot.onCommand("help", helpHandler(bot))
   bot.onCommand("ping", pingHandler(bot))
   bot.onCommand("about", aboutHandler(bot))
   bot.onCommand("uptime", uptimeHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
-  bot.onCommand("help", helpHandler(bot))
 
   bot.poll(polling_interval)
 
