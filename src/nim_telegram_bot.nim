@@ -12,16 +12,17 @@ const
   motd_text = staticRead("motd_text.md")
   donate_text = staticRead("donate_text.md")
   about_texts = fmt"""
-  Nim Telegram Bot 🤖
-  Version:     0.0.1 👾
-  Licence:     MIT 👽
-  Author:      Juan Carlos @juancarlospaco 😼
-  Compiled:    {CompileDate} {CompileTime} ⏰
-  Nim Version: {NimVersion} 👑
-  OS & CPU:    {hostOS} {hostCPU} 💻
-  Temp Dir:    {temp_folder}
-  Git Repo:    http://github.com/juancarlospaco/nim-telegram-bot
-  Bot uses:    """
+  *Nim Telegram Bot* 🤖
+
+  ☑️ *Version:*     `0.0.1` 👾
+  ☑️ *Licence:*     MIT 👽
+  ☑️ *Author:*      _Juan Carlos_ @juancarlospaco 😼
+  ☑️ *Compiled:*    `{CompileDate} {CompileTime}` ⏰
+  ☑️ *Nim Version:* `{NimVersion}` 👑
+  ☑️ *OS & CPU:*    `{hostOS} {hostCPU}` 💻
+  ☑️ *Temp Dir:*    `{temp_folder}` 📂
+  ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
+  ☑️ *Bot uses:*    """
 
 let
   configuration = loadConfig("config.ini")
@@ -77,12 +78,12 @@ template handlerizer(body: untyped): untyped =
 
 proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics, timeout=5)
+    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
     let message = responz.headers["location"]
 
 proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics, timeout=5)
+    let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
     let message = responz.headers["location"]
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
