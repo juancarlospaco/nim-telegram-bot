@@ -1,3 +1,5 @@
 nimcache/
 .directory
 *.kate-swp
+src/nim_telegram_bot
+src/config.ini
