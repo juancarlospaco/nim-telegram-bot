@@ -10,3 +10,4 @@ Commands:
 /help This Help.
 /coc Code Of Conduct.
 /donate Info about Donations.
+/motd Mensaje del Dia.
