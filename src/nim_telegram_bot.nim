@@ -1,6 +1,6 @@
 
 import times, asyncdispatch, osproc, ospaths, logging, options, httpclient
-import terminal, parsecfg, strutils, strformat
+import terminal, parsecfg, strutils, strformat, times
 import telebot  # nimble install telebot
 
 const
@@ -29,7 +29,7 @@ let
   polling_interval = parseInt(configuration.getSectionValue("", "polling_interval")).int32
   api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   start_time = cpuTime()
-assert polling_interval > 250
+assert polling_interval > 250, "ERROR: polling_interval must be > 250."
 
 var counter = 0
 addHandler(newConsoleLogger(fmtStr="$levelname, [$time] "))
@@ -64,75 +64,59 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
       discard bot.send(message)
   result = cb
 
-proc catHandler(bot: Telebot): CommandCallback =
+
+template handlerizer(body: untyped): untyped =
   proc cb(e: Command) {.async.} =
     inc counter
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
-    discard bot.send(newMessage(e.message.chat.id, responz.headers["location"]))
+    body
+    var msg = newMessage(e.message.chat.id, $message.strip())
+    msg.disableNotification = true
+    msg.parseMode = "markdown"
+    discard bot.send(msg)
   result = cb
+
+proc catHandler(bot: Telebot): CommandCallback =
+  handlerizer():
+    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics, timeout=5)
+    let message = responz.headers["location"]
 
 proc dogHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
-    discard bot.send(newMessage(e.message.chat.id, responz.headers["location"]))
-  result = cb
+  handlerizer():
+    let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics, timeout=5)
+    let message = responz.headers["location"]
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    discard bot.send(newMessage(e.message.chat.id, fmt"Uptime: {cpuTime() - start_time} ⏰"))
-  result = cb
+  handlerizer():
+    let message = fmt"*Uptime:* `{cpuTime() - start_time}` ⏰"
 
 proc pingHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    discard bot.send(newMessage(e.message.chat.id, "pong"))
-  result = cb
+  handlerizer():
+    let message = "*pong*"
 
 proc datetimeHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    discard bot.send(newMessage(e.message.chat.id, $now()))
-  result = cb
+  handlerizer():
+    let message = $now()
 
 proc aboutHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    discard bot.send(newMessage(e.message.chat.id, about_texts & $counter))
-  result = cb
+  handlerizer():
+    let message = about_texts & $counter
 
 proc helpHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    var message = newMessage(e.message.chat.id, helps_texts)
-    message.parseMode = "markdown"
-    discard bot.send(message)
-  result = cb
+  handlerizer():
+    let message = helps_texts
 
 proc cocHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    var message = newMessage(e.message.chat.id, coc_text)
-    message.parseMode = "markdown"
-    discard bot.send(message)
-  result = cb
+  handlerizer():
+    let message = coc_text
 
 proc donateHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    var message = newMessage(e.message.chat.id, donate_text)
-    message.parseMode = "markdown"
-    discard bot.send(message)
-  result = cb
+  handlerizer():
+    let message = donate_text
 
 proc motdHandler(bot: Telebot): CommandCallback =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    var message = newMessage(e.message.chat.id, motd_text)
-    message.parseMode = "markdown"
-    discard bot.send(message)
-  result = cb
+  handlerizer():
+    let message = motd_text
+
 
 proc main*(): auto =
 
