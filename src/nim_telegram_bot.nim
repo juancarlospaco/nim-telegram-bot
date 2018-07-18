@@ -5,6 +5,7 @@ import telebot  # nimble install telebot
 
 const
   temp_folder = getTempDir()
+  kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
   helps_texts = staticRead("help_text.md")
   coc_text = staticRead("coc_text.md")
   motd_text = staticRead("motd_text.md")
@@ -61,6 +62,13 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
       message.replyToMessageId = response.messageId
       message.parseMode = "markdown"
       discard bot.send(message)
+  result = cb
+
+proc catHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
+    discard bot.send(newMessage(e.message.chat.id, responz.headers["location"]))
   result = cb
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
@@ -124,6 +132,7 @@ proc main*(): auto =
 
   bot.onUpdate(handleUpdate(bot))
 
+  bot.onCommand("cat", catHandler(bot))
   bot.onCommand("coc", cocHandler(bot))
   bot.onCommand("motd", motdHandler(bot))
   bot.onCommand("help", helpHandler(bot))
