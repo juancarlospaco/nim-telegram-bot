@@ -1,23 +1,40 @@
 
-import telebot, asyncdispatch, logging, options, terminal, parsecfg, strutils, strformat
+import times, asyncdispatch, osproc, ospaths, logging, options, httpclient
+import terminal, parsecfg, strutils, strformat
+import telebot
 
+const
+  temp_folder = getTempDir()      ## Temp folder.
+  about_texts = fmt"""
+  Nim Telegram Bot 🤖
+  Version:     0.0.1 👾
+  Licence:     MIT 👽
+  Author:      Juan Carlos @juancarlospaco 😼
+  Compiled:    {CompileDate} {CompileTime} ⏰
+  Nim Version: {NimVersion} 👑
+  OS & CPU:    {hostOS} {hostCPU} 💻
+  Temp Dir:    {temp_folder}
+  Git Repo:    http://github.com/juancarlospaco/nim-telegram-bot
+  Bot uses:    """
 
 let
   configuration = loadConfig("config.ini")
   api_key = configuration.getSectionValue("", "api_key")
   polling_interval = parseInt(configuration.getSectionValue("", "polling_interval")).int32
+  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
+  start_time = cpuTime()
+assert polling_interval > 250
 
-
+var counter = 0
 var L = newConsoleLogger(fmtStr="$levelname, [$time] ")
 addHandler(L)
-
-
 
 
 proc handleUpdate(bot: TeleBot): UpdateCallback =
   proc cb(e: Update) {.async.} =
     var response = e.message.get
-    if response.text.isSome:
+
+    if response.text.isSome:  # Echo text message.
       let
         text = response.text.get
       var message = newMessage(response.chat.id, text)
@@ -25,26 +42,59 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
       message.replyToMessageId = response.messageId
       message.parseMode = "markdown"
       discard bot.send(message)
+
+    if response.document.isSome:   # files
+      let
+        code = response.document.get
+
+      echo code.file_name
+      echo code.mime_type
+      echo code.file_id
+      echo code.file_size
+
+      var message = newMessage(response.chat.id, $code)
+      message.disableNotification = true
+      message.replyToMessageId = response.messageId
+      message.parseMode = "markdown"
+      discard bot.send(message)
   result = cb
 
-proc greatingHandler(bot: Telebot): CommandCallback =
+proc uptimeHandler(bot: Telebot): CommandCallback =
   proc cb(e: Command) {.async.} =
-    var message = newMessage(e.message.chat.id, "hello " & e.message.fromUser.get().firstName)
-    message.disableNotification = true
-    message.replyToMessageId = e.message.messageId
-    message.parseMode = "markdown"
-    discard bot.send(message)
-
+    inc counter
+    discard bot.send(newMessage(e.message.chat.id, fmt"Uptime: {cpuTime() - start_time} ⏰"))
   result = cb
+
+proc pingHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    discard bot.send(newMessage(e.message.chat.id, "pong"))
+  result = cb
+
+proc datetimeHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    discard bot.send(newMessage(e.message.chat.id, $now()))
+  result = cb
+
+proc aboutHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    discard bot.send(newMessage(e.message.chat.id, about_texts & $counter))
+  result = cb
+
 
 proc main*(): auto =
   let
     bot = newTeleBot(api_key)
-    handler = handleUpdate(bot)
-    greatingCb = greatingHandler(bot)
 
-  bot.onUpdate(handler)
-  bot.onCommand("hello", greatingCb)
+  bot.onUpdate(handleUpdate(bot))
+
+  bot.onCommand("ping", pingHandler(bot))
+  bot.onCommand("about", aboutHandler(bot))
+  bot.onCommand("uptime", uptimeHandler(bot))
+  bot.onCommand("datetime", datetimeHandler(bot))
+
   bot.poll(polling_interval)
 
 
