@@ -1,10 +1,10 @@
 
 import times, asyncdispatch, osproc, ospaths, logging, options, httpclient
 import terminal, parsecfg, strutils, strformat
-import telebot
+import telebot  # nimble install telebot
 
 const
-  temp_folder = getTempDir()      ## Temp folder.
+  temp_folder = getTempDir()
   about_texts = fmt"""
   Nim Telegram Bot 🤖
   Version:     0.0.1 👾
@@ -85,8 +85,7 @@ proc aboutHandler(bot: Telebot): CommandCallback =
 
 
 proc main*(): auto =
-  let
-    bot = newTeleBot(api_key)
+  let bot = newTeleBot(api_key)
 
   bot.onUpdate(handleUpdate(bot))
 
