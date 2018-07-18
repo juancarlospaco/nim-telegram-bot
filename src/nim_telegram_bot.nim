@@ -136,6 +136,11 @@ proc motdHandler(bot: Telebot): CommandCallback =
   result = cb
 
 proc main*(): auto =
+
+  setBackgroundColor(bgBlack)
+  setForegroundColor(fgCyan)
+  defer: resetAttributes()
+
   let bot = newTeleBot(api_key)
 
   bot.onUpdate(handleUpdate(bot))
