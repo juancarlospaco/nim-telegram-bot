@@ -10,5 +10,6 @@ Commands:
 /help This Help.
 /coc Code Of Conduct.
 /cat 1 Random Kitten pic.
+/dog 1 Random Doge pic.
 /donate Info about Donations.
 /motd Mensaje del Dia.
