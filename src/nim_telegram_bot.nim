@@ -32,8 +32,7 @@ let
 assert polling_interval > 250
 
 var counter = 0
-var L = newConsoleLogger(fmtStr="$levelname, [$time] ")
-addHandler(L)
+addHandler(newConsoleLogger(fmtStr="$levelname, [$time] "))
 
 
 proc handleUpdate(bot: TeleBot): UpdateCallback =
