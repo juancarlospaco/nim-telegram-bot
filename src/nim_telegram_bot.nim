@@ -5,6 +5,7 @@ import telebot  # nimble install telebot
 
 const
   temp_folder = getTempDir()
+  helps_texts = staticRead("help_text.md")
   about_texts = fmt"""
   Nim Telegram Bot 🤖
   Version:     0.0.1 👾
@@ -83,6 +84,13 @@ proc aboutHandler(bot: Telebot): CommandCallback =
     discard bot.send(newMessage(e.message.chat.id, about_texts & $counter))
   result = cb
 
+proc helpHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    var message = newMessage(e.message.chat.id, helps_texts)
+    message.parseMode = "markdown"
+    discard bot.send(message)
+  result = cb
 
 proc main*(): auto =
   let bot = newTeleBot(api_key)
@@ -93,6 +101,7 @@ proc main*(): auto =
   bot.onCommand("about", aboutHandler(bot))
   bot.onCommand("uptime", uptimeHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
+  bot.onCommand("help", helpHandler(bot))
 
   bot.poll(polling_interval)
 
