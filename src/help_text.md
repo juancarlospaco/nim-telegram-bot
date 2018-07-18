@@ -9,3 +9,4 @@ Commands:
 /datetime Current Date and Time.
 /help This Help.
 /coc Code Of Conduct.
+/donate Info about Donations.

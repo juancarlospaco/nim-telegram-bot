@@ -7,6 +7,7 @@ const
   temp_folder = getTempDir()
   helps_texts = staticRead("help_text.md")
   coc_text = staticRead("coc_text.md")
+  donate_text = staticRead("donate_text.md")
   about_texts = fmt"""
   Nim Telegram Bot 🤖
   Version:     0.0.1 👾
@@ -101,7 +102,13 @@ proc cocHandler(bot: Telebot): CommandCallback =
     discard bot.send(message)
   result = cb
 
-
+proc donateHandler(bot: Telebot): CommandCallback =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    var message = newMessage(e.message.chat.id, donate_text)
+    message.parseMode = "markdown"
+    discard bot.send(message)
+  result = cb
 
 proc main*(): auto =
   let bot = newTeleBot(api_key)
@@ -113,6 +120,7 @@ proc main*(): auto =
   bot.onCommand("ping", pingHandler(bot))
   bot.onCommand("about", aboutHandler(bot))
   bot.onCommand("uptime", uptimeHandler(bot))
+  bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
 
   bot.poll(polling_interval)
