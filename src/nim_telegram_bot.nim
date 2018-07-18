@@ -1,4 +1,3 @@
-
 import times, asyncdispatch, osproc, ospaths, logging, options, httpclient
 import terminal, parsecfg, strutils, strformat, times
 import telebot  # nimble install telebot
@@ -19,7 +18,7 @@ const
   ☑️ *Author:*      _Juan Carlos_ @juancarlospaco 😼
   ☑️ *Compiled:*    `{CompileDate} {CompileTime}` ⏰
   ☑️ *Nim Version:* `{NimVersion}` 👑
-  ☑️ *OS & CPU:*    `{hostOS} {hostCPU}` 💻
+  ☑️ *OS & CPU:*    `{hostOS.toUpperAscii} {hostCPU.toUpperAscii}` 💻
   ☑️ *Temp Dir:*    `{temp_folder}` 📂
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
