@@ -3,36 +3,35 @@ import terminal, parsecfg, strutils, strformat, times
 import telebot  # nimble install telebot
 
 const
-  temp_folder = getTempDir()
-  kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
-  doge_pics = "https://source.unsplash.com/collection/1301659/480x480"
-  helps_texts = staticRead("help_text.md")
-  coc_text = staticRead("coc_text.md")
-  motd_text = staticRead("motd_text.md")
-  donate_text = staticRead("donate_text.md")
-  about_texts = fmt"""
-  *Nim Telegram Bot* 🤖
-
+  about_texts = fmt"""*Nim Telegram Bot* 🤖
   ☑️ *Version:*     `0.0.1` 👾
   ☑️ *Licence:*     MIT 👽
   ☑️ *Author:*      _Juan Carlos_ @juancarlospaco 😼
   ☑️ *Compiled:*    `{CompileDate} {CompileTime}` ⏰
   ☑️ *Nim Version:* `{NimVersion}` 👑
   ☑️ *OS & CPU:*    `{hostOS.toUpperAscii} {hostCPU.toUpperAscii}` 💻
-  ☑️ *Temp Dir:*    `{temp_folder}` 📂
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
+  temp_folder = getTempDir()
+  kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
+  doge_pics =   "https://source.unsplash.com/collection/1301659/480x480"
+  helps_texts = readFile("help_text.md")      # External *.md files.
+  coc_text =    readFile("coc_text.md")
+  motd_text =   readFile("motd_text.md")
+  donate_text = readFile("donate_text.md")
+  # helps_texts = staticRead("help_text.md")  # Embed the *.md files.
+  # coc_text =    staticRead("coc_text.md")
+  # motd_text =   staticRead("motd_text.md")
+  # donate_text = staticRead("donate_text.md")
 
 let
-  configuration = loadConfig("config.ini")
-  api_key = configuration.getSectionValue("", "api_key")
-  polling_interval = parseInt(configuration.getSectionValue("", "polling_interval")).int32
-  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
+  config_ini = loadConfig("config.ini")
+  api_key =    config_ini.getSectionValue("", "api_key")
+  poll_freq =  parseInt(config_ini.getSectionValue("", "polling_interval")).int32
+  api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
   start_time = cpuTime()
-assert polling_interval > 250, "ERROR: polling_interval must be > 250."
 
-var counter = 0
-addHandler(newConsoleLogger(fmtStr="$time $levelname "))
+var counter: int
 
 
 proc handleUpdate(bot: TeleBot): UpdateCallback =
@@ -120,6 +119,9 @@ proc motdHandler(bot: Telebot): CommandCallback =
 
 proc main*(): auto =
 
+  assert poll_freq >= 250, "ERROR: poll_freq must be >= 250."
+  addHandler(newConsoleLogger(fmtStr="$time $levelname "))
+
   setBackgroundColor(bgBlack)
   setForegroundColor(fgCyan)
   defer: resetAttributes()
@@ -139,7 +141,7 @@ proc main*(): auto =
   bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
 
-  bot.poll(polling_interval)
+  bot.poll(poll_freq)
 
 
 when isMainModule:
