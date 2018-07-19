@@ -32,9 +32,9 @@ upx --best --ultra-brute nim_telegram_bot
 
 - Rename the file `src/config.ini.TEMPLATE` to `src/config.ini`.
 - Edit the file `src/config.ini` to set `api_key` and `polling_interval`.
-- Edit the file `src/coc_text.md` to customize Code Of Conduct text.
-- Edit the file `src/motd_text.md` to customize Message Of The Day text.
-- Edit the file `src/donate_text.md` to customize Donations text.
+- Edit the file `src/coc_text.md` to customize **Code Of Conduct** text.
+- Edit the file `src/motd_text.md` to customize **Message Of The Day** text.
+- Edit the file `src/donate_text.md` to customize **Donations** text.
 
 You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
 
@@ -45,7 +45,7 @@ You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
 ./nim_telegram_bot
 ```
 
-You can use any linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
+**Optional**, you can use any Linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
 
 
 ## Requisites
