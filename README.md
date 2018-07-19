@@ -17,7 +17,7 @@ cd nim-telegram-bot/src/
 Compile:
 
 ```bash
-nim c -d:release --opt:size -d:ssl nim_telegram_bot.nim
+nim c -d:release --app:console --opt:size -d:ssl nim_telegram_bot.nim
 strip --strip-all nim_telegram_bot
 ```
 
@@ -64,6 +64,8 @@ You can hack any of the `*.ini` and `*.md` on the `/src/` folder to customize.
 
 ### Single File
 
+**Optional**, this is for advanced users only.
+
 If you want to compile to 1 file, without any extra `*.md` files.
 
 On the source code find and remove the lines:
@@ -103,6 +105,18 @@ nim c --profiler:on --stacktrace:on -d:ssl -d:release --app:console --opt:size n
 ```
 
 Then open the file `profile_results.txt`.
+
+
+## Check code
+
+**Optional**, this is for advanced developers only.
+
+How to Lint the code.
+
+```bash
+nimble check
+nim check src/nim_telegram_bot.nim
+```
 
 
 ### Contributions
