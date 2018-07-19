@@ -1,1 +1,1 @@
-Code Of Conduct.
+*Code Of Conduct.*
