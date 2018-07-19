@@ -3,7 +3,7 @@
 - Easy `*.INI` and `*.MD` Customization.
 - Single Binary, ~128 Kilobytes size. Tiny CPU & Net use. No dependencies (compiled).
 
-![Rlyeh HackLab](nim-telegram-bot-rlye.jpg "Art by Rlyeh HackLab http://rlab.be")
+![Rlyeh HackLab](nim-telegram-bot-rlye.png "Art by Rlyeh HackLab http://rlab.be")
 
 
 ### Compile
