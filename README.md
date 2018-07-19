@@ -1,12 +1,11 @@
 # nim-telegram-bot
 
-- Easy `*.INI` and `*.MD` Customization.
-- Single Binary, ~128 Kilobytes size. Tiny CPU & Net use. No dependencies (compiled).
+- Easy `*.INI` & `*.MD` Customization. Single Binary, ~128 Kilobytes size. Tiny CPU & Net use. No dependencies.
 
 ![Rlyeh HackLab](art/nim-telegram-bot-rlye.svg "Art by Rlyeh HackLab http://rlab.be")
 
 
-### Compile
+## Compile
 
 Get the Code:
 
@@ -29,18 +28,21 @@ upx --best --ultra-brute nim_telegram_bot
 ```
 
 
-### Run
+## Run
 
 ```bash
 ./nim_telegram_bot
 ```
 
 
-### Requisites
+## Requisites
 
 *For Compilation only!, if it compiles it does not need Nim nor Telebot.*
 
 - [Nim](https://nim-lang.org/install_unix.html)
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
 
-You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
+
+## Customize
+
+- You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
