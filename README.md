@@ -1,7 +1,5 @@
 # nim-telegram-bot
 
-Nim Telegram Bot.
-
 - Easy `*.INI` and `*.MD` Customization.
 - Single Binary, ~128 Kilobytes size. Tiny CPU & Net use. No dependencies (compiled).
 
@@ -9,6 +7,8 @@ Nim Telegram Bot.
 ### Compile
 
 ```bash
+git clone https://github.com/juancarlospaco/nim-telegram-bot.git
+cd nim-telegram-bot/src/
 nim c -d:release --opt:size -d:ssl nim_telegram_bot.nim
 strip --strip-all nim_telegram_bot
 ```
