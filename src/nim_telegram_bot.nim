@@ -1,5 +1,6 @@
 import asyncdispatch, httpclient, logging, options, ospaths, osproc, parsecfg, strformat, strutils, terminal, times
 import telebot  # nimble install telebot   https://nimble.directory/pkg/telebot
+# import nimprof
 
 const
   about_texts = fmt"""*Nim Telegram Bot* 🤖

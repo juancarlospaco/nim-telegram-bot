@@ -91,6 +91,20 @@ You will need to Recompile to change any content of the `src/*.md` files.
 You can later delete all the `src/*.md` files.
 
 
+### Performance Profiling
+
+**Optional**, this is for advanced developers only.
+
+Find and uncomment the line `import nimprof` on `nim_telegram_bot.nim`.
+
+```bash
+nim c --profiler:on --stacktrace:on -d:ssl -d:release --app:console --opt:size nim_telegram_bot.nim
+./nim_telegram_bot
+```
+
+Then open the file `profile_results.txt`.
+
+
 ### Contributions
 
 - This is cross-collaboration work of [Rlyeh HackLab](https://rlab.be) and [NimAr](https://t.me/NimArgentina) communities.
