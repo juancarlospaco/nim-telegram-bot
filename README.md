@@ -27,6 +27,12 @@ strip --strip-all nim_telegram_bot
 upx --best --ultra-brute nim_telegram_bot
 ```
 
+**Optional**, Compilation and Run for Development only (Hacks, testing, dev, etc)
+
+```bash
+nim c -r -d:ssl nim_telegram_bot.nim
+```
+
 
 ## Config
 
@@ -52,7 +58,7 @@ You can hack any of the `*.ini` and `*.md` on the `/src/` folder to customize.
 
 *For Compilation only!, if it compiles it does not need Nim nor Telebot.*
 
-- [Nim](https://nim-lang.org/install_unix.html)
+- [Nim](https://nim-lang.org/install_unix.html) `>= 0.18.0`
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
 
 
