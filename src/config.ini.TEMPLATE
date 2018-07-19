@@ -1,2 +1,2 @@
-api_key = ""
-polling_interval = 500
+api_key = ""            # Telegram API Key. @BotFather gives this Keys.
+polling_interval = 500  # Telegram API Long Pooling Interval for the Bot. 100~500 is Ok.

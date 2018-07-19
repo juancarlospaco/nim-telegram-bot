@@ -24,11 +24,11 @@ const
   # donate_text = staticRead("donate_text.md")
 
 let
+  start_time = cpuTime()
   config_ini = loadConfig("config.ini")
   api_key =    config_ini.getSectionValue("", "api_key")
-  poll_freq =  parseInt(config_ini.getSectionValue("", "polling_interval")).int32
   api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
-  start_time = cpuTime()
+  polling_interval: range[100..500] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
 
 var counter: int
 
@@ -118,7 +118,6 @@ proc motdHandler(bot: Telebot): CommandCallback =
 
 proc main*(): auto =
 
-  assert poll_freq >= 250, "ERROR: poll_freq must be >= 250."
   addHandler(newConsoleLogger(fmtStr="$time $levelname "))
 
   setBackgroundColor(bgBlack)
@@ -140,7 +139,7 @@ proc main*(): auto =
   bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
 
-  bot.poll(poll_freq)
+  bot.poll(polling_interval)
 
 
 when isMainModule:
