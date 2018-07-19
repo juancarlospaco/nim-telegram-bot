@@ -33,3 +33,5 @@ upx --best --ultra-brute nim_telegram_bot
 
 - [Nim](https://nim-lang.org/install_unix.html)
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
+
+You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
