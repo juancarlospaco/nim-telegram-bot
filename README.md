@@ -6,9 +6,16 @@
 
 ### Compile
 
+Get the Code:
+
 ```bash
 git clone https://github.com/juancarlospaco/nim-telegram-bot.git
 cd nim-telegram-bot/src/
+```
+
+Compile:
+
+```bash
 nim c -d:release --opt:size -d:ssl nim_telegram_bot.nim
 strip --strip-all nim_telegram_bot
 ```
