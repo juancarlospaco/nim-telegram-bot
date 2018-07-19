@@ -30,6 +30,12 @@ upx --best --ultra-brute nim_telegram_bot
 
 ## Run
 
+- Rename the file `src/config.ini.TEMPLATE` to `src/config.ini`.
+- Edit the file `src/config.ini` to set `api_key` and `polling_interval`.
+- Edit the file `src/coc_text.md` to customize Code Of Conduct text.
+- Edit the file `src/motd_text.md` to customize Message Of The Day text.
+- Edit the file `src/donate_text.md` to customize Donations text.
+
 ```bash
 ./nim_telegram_bot
 ```
