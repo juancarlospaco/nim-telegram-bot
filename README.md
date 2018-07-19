@@ -83,3 +83,8 @@ Recompile, it will Embed all the `src/*.md` files on the binary executable.
 You will need to Recompile to change any content of the `src/*.md` files.
 
 You can later delete all the `src/*.md` files.
+
+
+### Contributions
+
+- This is cross-collaboration work of [Rlyeh HackLab](https://rlab.be) and [NimAr](https://t.me/NimArgentina) communities.
