@@ -36,7 +36,7 @@ upx --best --ultra-brute nim_telegram_bot
 - Edit the file `src/motd_text.md` to customize **Message Of The Day** text.
 - Edit the file `src/donate_text.md` to customize **Donations** text.
 
-You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
+You can hack any of the `*.ini` and `*.md` on the `/src/` folder to customize.
 
 
 ## Run
