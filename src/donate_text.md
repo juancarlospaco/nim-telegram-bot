@@ -1,1 +1,1 @@
-*Info about Donations.*
+💸💵💰  *Info about Donations.*  💸💵💰
