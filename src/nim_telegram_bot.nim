@@ -116,6 +116,35 @@ proc motdHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = motd_text
 
+when defined(linux):
+  proc dfHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("df --human-readable --local --total --print-type")[0]}`"""
+
+  proc freeHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("free --human --total --giga")[0]}`"""
+
+  proc ipHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("ip -brief address")[0]}`"""
+
+  proc lshwHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("lshw -short")[0]}`"""
+
+  proc lsusbHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("lsusb")[0]}`"""
+
+  proc lspciHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("lspci")[0]}`"""
+
+  proc lspciHandler(bot: Telebot): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx("lspci")[0]}`"""
+
 
 proc main*(): auto =
 
@@ -139,6 +168,14 @@ proc main*(): auto =
   bot.onCommand("uptime", uptimeHandler(bot))
   bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
+
+  when defined(linux):
+    bot.onCommand("ip", ipHandler(bot))
+    bot.onCommand("df", dfHandler(bot))
+    bot.onCommand("free", freeHandler(bot))
+    bot.onCommand("lshw", lshwHandler(bot))
+    bot.onCommand("lsusb", lsusbHandler(bot))
+    bot.onCommand("lspci", lspciHandler(bot))
 
   bot.poll(polling_interval)
 
