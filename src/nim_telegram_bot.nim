@@ -141,10 +141,6 @@ when defined(linux):
     handlerizer():
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
-  proc lspciHandler(bot: Telebot): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx("lspci")[0]}`"""
-
 
 proc main*(): auto =
 
