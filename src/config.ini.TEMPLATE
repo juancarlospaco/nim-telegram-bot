@@ -1,2 +1,4 @@
-api_key = ""            # Telegram API Key. @BotFather gives this Keys.
-polling_interval = 500  # Telegram API Long Pooling Interval for the Bot. 100~500 is Ok.
+# Telegram API Key, @BotFather gives this Keys, is like a unique ID for Bots.
+api_key = ""
+# Telegram API Long-Pooling Interval, 99~999 is Valid, 100~500 is Best. 100=responsive, more net use, more requests/minute. 500=slow,tiny net use,less requests/minute.
+polling_interval = 500

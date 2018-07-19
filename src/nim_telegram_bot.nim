@@ -28,7 +28,7 @@ let
   config_ini = loadConfig("config.ini")
   api_key =    config_ini.getSectionValue("", "api_key")
   api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
-  polling_interval: range[100..500] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
+  polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
 
 var counter: int
 
