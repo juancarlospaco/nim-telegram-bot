@@ -29,7 +29,7 @@ upx --best --ultra-brute nim_telegram_bot
 
 ### Requisites
 
-*For Compilation only!, if compiles it does not need Nim nor Telebot.*
+*For Compilation only!, if it compiles it does not need Nim nor Telebot.*
 
 - [Nim](https://nim-lang.org/install_unix.html)
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
