@@ -28,7 +28,7 @@ upx --best --ultra-brute nim_telegram_bot
 ```
 
 
-## Run
+## Config
 
 - Rename the file `src/config.ini.TEMPLATE` to `src/config.ini`.
 - Edit the file `src/config.ini` to set `api_key` and `polling_interval`.
@@ -36,9 +36,16 @@ upx --best --ultra-brute nim_telegram_bot
 - Edit the file `src/motd_text.md` to customize Message Of The Day text.
 - Edit the file `src/donate_text.md` to customize Donations text.
 
+You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
+
+
+## Run
+
 ```bash
 ./nim_telegram_bot
 ```
+
+You can use any linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
 
 
 ## Requisites
@@ -47,8 +54,3 @@ upx --best --ultra-brute nim_telegram_bot
 
 - [Nim](https://nim-lang.org/install_unix.html)
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
-
-
-## Customize
-
-- You can hack any of the `*.INI` and `*.MD` on the `/src/` folder to customize.
