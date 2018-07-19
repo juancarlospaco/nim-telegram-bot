@@ -54,3 +54,32 @@ You can use any linux command like `chrt`, `trickle`, `firejails`, `docker`, `rk
 
 - [Nim](https://nim-lang.org/install_unix.html)
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
+
+
+### Single File
+
+If you want to compile to 1 file, without any extra `*.md` files.
+
+On the source code find and remove the lines:
+
+```nim
+helps_texts = readFile("help_text.md")
+coc_text =    readFile("coc_text.md")
+motd_text =   readFile("motd_text.md")
+donate_text = readFile("donate_text.md")
+```
+
+On the source code find and uncomment the lines:
+
+```nim
+helps_texts = staticRead("help_text.md")
+coc_text =    staticRead("coc_text.md")
+motd_text =   staticRead("motd_text.md")
+donate_text = staticRead("donate_text.md")
+```
+
+Recompile, it will Embed all the `src/*.md` files on the binary executable.
+
+You will need to Recompile to change any content of the `src/*.md` files.
+
+You can later delete all the `src/*.md` files.
