@@ -11,6 +11,7 @@ Commands:
 🔵 /cat      1 Random Kitten pic.
 🔵 /dog      1 Random Doge pic.
 🔵 /donate   Info about Donations.
+🔵 /dollar   Dollar/Euro/BitCoin/Gold Prices.
 🔵 /motd     Message Of The Day.
 
 Comandos:
@@ -24,4 +25,5 @@ Comandos:
 🔵 /cat      1 Foto de Gatitos random.
 🔵 /dog      1 Foto de Perritos random.
 🔵 /donate   Info de Donaciones.
+🔵 /dollar   Precio Dolar/Euro/BitCoin/Oro.
 🔵 /motd     Mensaje del Dia.

@@ -1,5 +1,6 @@
-import asyncdispatch, httpclient, logging, options, ospaths, osproc, parsecfg, strformat, strutils, terminal, times
-import telebot  # nimble install telebot   https://nimble.directory/pkg/telebot
+import asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg, strformat, strutils, terminal, times
+import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
+import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 # import nimprof
 
 const
@@ -28,8 +29,16 @@ let
   start_time = cpuTime()
   config_ini = loadConfig("config.ini")
   api_key =    config_ini.getSectionValue("", "api_key")
+  server_cmd = parseBool(config_ini.getSectionValue("", "server_admin_commands"))
   api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
+  oer_client = OpenExchangeRates(timeout: 5,
+                                 api_key: config_ini.getSectionValue("", "api_key_openexchangerates"),
+                                 base: "USD",
+                                 local_base: "",  # "ARS",
+                                 round_float: true,
+                                 prettyprint: true,
+                                 show_alternative: true)
 
 var counter: int
 
@@ -116,6 +125,10 @@ proc motdHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = motd_text
 
+proc dollarHandler(bot: Telebot): CommandCallback =
+  handlerizer():
+    let message = fmt"""`{waitFor(oer_client.latest_async())}`"""
+
 when defined(linux):
   proc dfHandler(bot: Telebot): CommandCallback =
     handlerizer():
@@ -161,17 +174,19 @@ proc main*(): auto =
   bot.onCommand("help", helpHandler(bot))
   bot.onCommand("ping", pingHandler(bot))
   bot.onCommand("about", aboutHandler(bot))
+  bot.onCommand("dollar", dollarHandler(bot))
   bot.onCommand("uptime", uptimeHandler(bot))
   bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
 
   when defined(linux):
-    bot.onCommand("ip", ipHandler(bot))
-    bot.onCommand("df", dfHandler(bot))
-    bot.onCommand("free", freeHandler(bot))
-    bot.onCommand("lshw", lshwHandler(bot))
-    bot.onCommand("lsusb", lsusbHandler(bot))
-    bot.onCommand("lspci", lspciHandler(bot))
+    if server_cmd:
+      bot.onCommand("ip", ipHandler(bot))
+      bot.onCommand("df", dfHandler(bot))
+      bot.onCommand("free", freeHandler(bot))
+      bot.onCommand("lshw", lshwHandler(bot))
+      bot.onCommand("lsusb", lsusbHandler(bot))
+      bot.onCommand("lspci", lspciHandler(bot))
 
   bot.poll(polling_interval)
 
