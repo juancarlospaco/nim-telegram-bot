@@ -51,6 +51,16 @@ The binary executable needs the following files on the same current folder:
 - `motd_text.md`
 - `donate_text.md`
 
+Example:
+
+```
+/home/user/bot/nim_telegram_bot
+/home/user/bot/config.ini
+/home/user/bot/coc_text.md
+/home/user/bot/motd_text.md
+/home/user/bot/donate_text.md
+```
+
 **Optional**, you can use any Linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
 
 
