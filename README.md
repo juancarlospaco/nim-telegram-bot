@@ -1,6 +1,6 @@
 # nim-telegram-bot
 
-- Easy `*.INI` & `*.MD` Customization. Single Binary, ~128 Kilobytes size. Tiny CPU & Net use. No dependencies.
+- Easy `*.ini` & `*.md` Customization. Single Binary, ~150 Kilobytes size. Tiny CPU & Net use. No dependencies.
 
 ![Rlyeh HackLab](art/nim-telegram-bot-rlye.svg "Art by Rlyeh HackLab http://rlab.be")
 
@@ -11,20 +11,13 @@ Get the Code:
 
 ```bash
 git clone https://github.com/juancarlospaco/nim-telegram-bot.git
-cd nim-telegram-bot/src/
+cd nim-telegram-bot/
 ```
 
 Compile:
 
 ```bash
-nim c -d:release --app:console --opt:size -d:ssl nim_telegram_bot.nim
-strip --strip-all nim_telegram_bot
-```
-
-**Optional** (compress binary, half size):
-
-```bash
-upx --best --ultra-brute nim_telegram_bot
+nim e build_nim_telegram_bot.nims
 ```
 
 **Optional**, Compilation and Run for Development only (Hacks, testing, dev, etc)
@@ -36,13 +29,13 @@ nim c -r -d:ssl nim_telegram_bot.nim
 
 ## Config
 
-- Rename the file `src/config.ini.TEMPLATE` to `src/config.ini`.
-- Edit the file `src/config.ini` to set `api_key` and `polling_interval`.
-- Edit the file `src/coc_text.md` to customize **Code Of Conduct** text.
-- Edit the file `src/motd_text.md` to customize **Message Of The Day** text.
-- Edit the file `src/donate_text.md` to customize **Donations** text.
+- Rename the file `config.ini.TEMPLATE` to `config.ini`.
+- Edit the file `config.ini` to set `api_key`, `polling_interval`, etc.
+- Edit the file `coc_text.md` to customize **Code Of Conduct** text.
+- Edit the file `motd_text.md` to customize **Message Of The Day** text.
+- Edit the file `donate_text.md` to customize **Donations** text.
 
-You can hack any of the `*.ini` and `*.md` on the `/src/` folder to customize.
+You can hack any of the `*.ini` and `*.md` to customize.
 
 
 ## Run
@@ -86,11 +79,11 @@ motd_text =   staticRead("motd_text.md")
 donate_text = staticRead("donate_text.md")
 ```
 
-Recompile, it will Embed all the `src/*.md` files on the binary executable.
+Recompile, it will Embed all the `*.md` files on the binary executable.
 
-You will need to Recompile to change any content of the `src/*.md` files.
+You will need to Recompile to change any content of the `*.md` files.
 
-You can later delete all the `src/*.md` files.
+You can later delete all the `*.md` files.
 
 
 ### Performance Profiling
