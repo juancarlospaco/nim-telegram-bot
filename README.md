@@ -33,6 +33,7 @@ nim c -r -d:ssl nim_telegram_bot.nim
 - Edit the file `config.ini` to set `api_key`, `polling_interval`, etc.
 - Edit the file `coc_text.md` to customize **Code Of Conduct** text.
 - Edit the file `motd_text.md` to customize **Message Of The Day** text.
+- Edit the file `help_text.md` to customize **Help** text.
 - Edit the file `donate_text.md` to customize **Donations** text.
 
 You can hack any of the `*.ini` and `*.md` to customize.
@@ -49,6 +50,7 @@ The binary executable needs the following files on the same current folder:
 - `config.ini`
 - `coc_text.md`
 - `motd_text.md`
+- `help_text.md`
 - `donate_text.md`
 
 Example:
@@ -58,6 +60,7 @@ Example:
 /home/user/bot/config.ini
 /home/user/bot/coc_text.md
 /home/user/bot/motd_text.md
+/home/user/bot/help_text.md
 /home/user/bot/donate_text.md
 ```
 
