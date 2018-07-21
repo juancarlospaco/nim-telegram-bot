@@ -44,6 +44,13 @@ You can hack any of the `*.ini` and `*.md` to customize.
 ./nim_telegram_bot
 ```
 
+The binary executable needs the following files on the same current folder:
+
+- `config.ini`
+- `coc_text.md`
+- `motd_text.md`
+- `donate_text.md`
+
 **Optional**, you can use any Linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
 
 
