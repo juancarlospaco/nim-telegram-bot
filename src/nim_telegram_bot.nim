@@ -85,19 +85,24 @@ template handlerizer(body: untyped): untyped =
 
 proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
-    let message = responz.headers["location"]
+    let
+      responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
+      cat_pic = await responz.headers["location"]
+      message = cat_pic
 
 proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
-    let message = responz.headers["location"]
+    let
+      responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
+      dog_pic = await responz.headers["location"]
+      message = dog_pic
 
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient().get(pub_ip_api)  # await response
-    let publ_ip = await responz.body                          # await body
-    let message = fmt"*Server Public IP Address:* `{publ_ip}`"
+    let
+      responz = await newAsyncHttpClient().get(pub_ip_api)  # await response
+      publ_ip = await responz.body                          # await body
+      message = fmt"*Server Public IP Address:* `{publ_ip}`"
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
   handlerizer():

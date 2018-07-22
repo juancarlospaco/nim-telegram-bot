@@ -6,7 +6,7 @@
 echo "Building for Linux"
 exec "nim c -d:release -d:ssl --app:console --opt:size --out:downloads/nim_telegram_bot src/nim_telegram_bot.nim"
 exec "strip --verbose -ss downloads/nim_telegram_bot"
-exec "upx --best --ultra-brute downloads/nim_telegram_bot"
+# exec "upx --best --ultra-brute downloads/nim_telegram_bot"
 exec "sha1sum --tag downloads/nim_telegram_bot > downloads/nim_telegram_bot.sha1"
 exec "sha512sum --tag downloads/nim_telegram_bot > downloads/nim_telegram_bot.sha512"
 # exec "keybase sign --infile downloads/nim_telegram_bot --outfile downloads/nim_telegram_bot.asc"
