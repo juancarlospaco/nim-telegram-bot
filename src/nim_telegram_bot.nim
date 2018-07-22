@@ -55,20 +55,21 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
       message.parseMode = "markdown"
       discard bot.send(message)
 
-    if response.document.isSome:   # files
-      let
-        code = response.document.get
+#     if response.document.isSome:   # files
+#       let
+#         code = response.document.get
+#
+#       echo code.file_name
+#       echo code.mime_type
+#       echo code.file_id
+#       echo code.file_size
+#
+#       var message = newMessage(response.chat.id, $code)
+#       message.disableNotification = true
+#       message.replyToMessageId = response.messageId
+#       message.parseMode = "markdown"
+#       discard bot.send(message)
 
-      echo code.file_name
-      echo code.mime_type
-      echo code.file_id
-      echo code.file_size
-
-      var message = newMessage(response.chat.id, $code)
-      message.disableNotification = true
-      message.replyToMessageId = response.messageId
-      message.parseMode = "markdown"
-      discard bot.send(message)
   result = cb
 
 

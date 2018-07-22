@@ -1,1 +1,1 @@
-coc_text.md
+⚖️  *Code Of Conduct.*  ⚖️

@@ -1,1 +1,1 @@
-donate_text.md
+💸💵💰  *Info about Donations.*  💸💵💰

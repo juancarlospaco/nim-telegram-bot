@@ -1,1 +1,1 @@
-motd_text.md
+*Message Of The Day.*
