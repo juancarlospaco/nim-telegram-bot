@@ -13,9 +13,9 @@ const
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
   temp_folder = getTempDir()
-  pub_ip_api =  "https://api.ipify.org"
+  pub_ip_api  = "https://api.ipify.org"
   kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
-  doge_pics =   "https://source.unsplash.com/collection/1301659/480x480"
+  doge_pics   = "https://source.unsplash.com/collection/1301659/480x480"
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -28,15 +28,15 @@ const
 let
   start_time = cpuTime()
   config_ini = loadConfig("config.ini")
-  api_key =    config_ini.getSectionValue("", "api_key")
-  server_cmd_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
-  server_cmd_df = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
-  server_cmd_free = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "free"))
-  server_cmd_lshw = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lshw"))
+  api_key    = config_ini.getSectionValue("", "api_key")
+  server_cmd_ip    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
+  server_cmd_df    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
+  server_cmd_free  = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "free"))
+  server_cmd_lshw  = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lshw"))
   server_cmd_lsusb = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lsusb"))
   server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
   server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
-  api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
+  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
 
 var counter: int
@@ -94,8 +94,9 @@ proc dogHandler(bot: Telebot): CommandCallback =
 
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
-    let responz = await newAsyncHttpClient().get(pub_ip_api)
-    let message = fmt"*Server Public IP:* `{responz.body}`"
+    let responz = await newAsyncHttpClient().get(pub_ip_api)  # await response
+    let publ_ip = await responz.body                          # await body
+    let message = fmt"*Server Public IP Address:* `{publ_ip}`"
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
   handlerizer():
