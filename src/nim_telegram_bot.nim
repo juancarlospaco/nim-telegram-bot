@@ -1,6 +1,5 @@
 import asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg, strformat, strutils, terminal, times
 import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
-# import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 # import nimprof
 
 const
@@ -14,9 +13,9 @@ const
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
   temp_folder = getTempDir()
+  pub_ip_api =  "https://api.ipify.org"
   kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
   doge_pics =   "https://source.unsplash.com/collection/1301659/480x480"
-  pub_ip_api =  "https://api.ipify.org"
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -39,13 +38,6 @@ let
   server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
   api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
-  #oer_client = AsyncOER(timeout: 5,
-  #                      api_key: config_ini.getSectionValue("", "api_key_openexchangerates"),
-  #                      base: "USD",
-  #                      local_base: "",  # "ARS",
-  #                      round_float: true,
-  #                      prettyprint: true,
-  #                      show_alternative: true)
 
 var counter: int
 
@@ -137,10 +129,6 @@ proc motdHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = motd_text
 
-# proc dollarHandler(bot: Telebot): CommandCallback =
-#   handlerizer():
-#     let msg = await oer_client.currencies()
-#     let message = msg
 
 when defined(linux):
   proc dfHandler(bot: Telebot): CommandCallback =
@@ -187,7 +175,6 @@ proc main*(): auto =
   bot.onCommand("help", helpHandler(bot))
   bot.onCommand("ping", pingHandler(bot))
   bot.onCommand("about", aboutHandler(bot))
-  # bot.onCommand("dollar", dollarHandler(bot))
   bot.onCommand("uptime", uptimeHandler(bot))
   bot.onCommand("donate", donateHandler(bot))
   bot.onCommand("datetime", datetimeHandler(bot))
