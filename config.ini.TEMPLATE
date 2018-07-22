@@ -2,7 +2,16 @@
 api_key = ""
 # Telegram API Long-Pooling Interval, 99~999 is Valid, 100~500 is Best. 100=responsive, more net use, more requests/minute. 500=slow,tiny net use,less requests/minute.
 polling_interval = 500
-# Enable/Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
-server_admin_commands = true
 # API Key Free https://openexchangerates.org/account/app-ids
 api_key_openexchangerates = ""
+
+
+# Enable / Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
+[linux_server_admin_commands]
+ip        = true
+df        = true
+free      = true
+lshw      = true
+lsusb     = true
+lspci     = true
+public_ip = true

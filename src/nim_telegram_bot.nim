@@ -16,6 +16,7 @@ const
   temp_folder = getTempDir()
   kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
   doge_pics =   "https://source.unsplash.com/collection/1301659/480x480"
+  pub_ip_api =  "https://api.ipify.org"
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -29,7 +30,13 @@ let
   start_time = cpuTime()
   config_ini = loadConfig("config.ini")
   api_key =    config_ini.getSectionValue("", "api_key")
-  server_cmd = parseBool(config_ini.getSectionValue("", "server_admin_commands"))
+  server_cmd_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
+  server_cmd_df = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
+  server_cmd_free = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "free"))
+  server_cmd_lshw = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lshw"))
+  server_cmd_lsusb = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lsusb"))
+  server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
+  server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
   api_url =    fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
   #oer_client = AsyncOER(timeout: 5,
@@ -92,6 +99,11 @@ proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
     let message = responz.headers["location"]
+
+proc public_ipHandler(bot: Telebot): CommandCallback =
+  handlerizer():
+    let responz = await newAsyncHttpClient().get(pub_ip_api)
+    let message = fmt"*Server Public IP:* `{responz.body}`"
 
 proc uptimeHandler(bot: Telebot): CommandCallback =
   handlerizer():
@@ -181,13 +193,20 @@ proc main*(): auto =
   bot.onCommand("datetime", datetimeHandler(bot))
 
   when defined(linux):
-    if server_cmd:
+    if server_cmd_ip:
       bot.onCommand("ip", ipHandler(bot))
+    if server_cmd_df:
       bot.onCommand("df", dfHandler(bot))
+    if server_cmd_free:
       bot.onCommand("free", freeHandler(bot))
+    if server_cmd_lshw:
       bot.onCommand("lshw", lshwHandler(bot))
+    if server_cmd_lsusb:
       bot.onCommand("lsusb", lsusbHandler(bot))
+    if server_cmd_lspci:
       bot.onCommand("lspci", lspciHandler(bot))
+    if server_cmd_public_ip:
+      bot.onCommand("public_ip", public_ipHandler(bot))
 
   bot.poll(polling_interval)
 
