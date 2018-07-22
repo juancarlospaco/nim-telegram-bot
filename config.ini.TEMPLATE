@@ -6,10 +6,17 @@ polling_interval = 500
 
 # Enable / Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
 [linux_server_admin_commands]
-ip        = true
-df        = true
-free      = true
-lshw      = true
-lsusb     = true
-lspci     = true
-public_ip = true
+ip           = true
+df           = true
+free         = true
+lshw         = true
+lsusb        = true
+lspci        = true
+# Allow any user to see the current Servers Public IP.
+public_ip    = true
+ # Allow any user to take WebCam Photos from servers WebCam.
+webcam       = true
+ # true = WebP, false = JPG, WebP half size than JPG.
+webcam_webp  = true
+# FFMPEG Filter to Blurr the WebCam Image http://ffmpeg.org/ffmpeg-filters.html#boxblur
+webcam_blurr = "boxblur=luma_radius=min(h\,w)/10:luma_power=1:chroma_radius=min(cw\,ch)/10:chroma_power=1"
