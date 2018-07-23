@@ -80,7 +80,10 @@ template handlerizer(body: untyped): untyped =
     var msg = newMessage(e.message.chat.id, $message.strip())
     msg.disableNotification = true
     msg.parseMode = "markdown"
-    discard bot.send(msg)
+    try:
+      discard bot.send(msg)  # Sometimes Telegram API just ignores requests (?).
+    except Exception:
+      discard
   result = cb
 
 proc catHandler(bot: Telebot): CommandCallback =
