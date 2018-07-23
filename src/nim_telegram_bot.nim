@@ -164,7 +164,7 @@ when defined(linux):
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
 
-proc main*(): auto =
+proc main*() {.async.} =
 
   addHandler(newConsoleLogger(fmtStr="$time $levelname "))
 
@@ -207,4 +207,4 @@ proc main*(): auto =
 
 
 when isMainModule:
-  main()
+  waitFor(main())
