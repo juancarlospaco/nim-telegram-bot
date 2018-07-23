@@ -16,6 +16,8 @@ const
   pub_ip_api  = "https://api.ipify.org"
   kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
   doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
+  bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
+  sea_pics    = "https://source.unsplash.com/collection/2160165/99x99"  # 480x480
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -98,6 +100,18 @@ proc dogHandler(bot: Telebot): CommandCallback =
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
       message = responz.headers["location"].split("?")[0]
 
+proc bigcatHandler(bot: Telebot): CommandCallback =
+  handlerizer():
+    let
+      responz = await newAsyncHttpClient(maxRedirects=0).get(bigcat_pics)
+      message = responz.headers["location"].split("?")[0]
+
+proc seaHandler(bot: Telebot): CommandCallback =
+  handlerizer():
+    let
+      responz = await newAsyncHttpClient(maxRedirects=0).get(sea_pics)
+      message = responz.headers["location"].split("?")[0]
+
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
@@ -178,6 +192,8 @@ proc main*() {.async.} =
 
   bot.onCommand("cat", catHandler(bot))
   bot.onCommand("dog", dogHandler(bot))
+  bot.onCommand("bigcat", bigcatHandler(bot))
+  bot.onCommand("sea", seaHandler(bot))
   bot.onCommand("coc", cocHandler(bot))
   bot.onCommand("motd", motdHandler(bot))
   bot.onCommand("help", helpHandler(bot))
