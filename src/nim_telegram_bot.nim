@@ -87,15 +87,13 @@ proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
-      cat_pic = await responz.headers["location"]
-      message = cat_pic
+      message = responz.headers["location"]
 
 proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
-      dog_pic = await responz.headers["location"]
-      message = dog_pic
+      message = responz.headers["location"]
 
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
