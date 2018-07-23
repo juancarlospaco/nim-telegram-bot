@@ -1,5 +1,6 @@
-import asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg, strformat, strutils, terminal, times
-import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
+import asyncdispatch, httpclient, logging, json, options, ospaths, osproc
+import parsecfg, strformat, strutils, terminal, times
+import telebot  # nimble install telebot https://nimble.directory/pkg/telebot
 # import nimprof
 
 const
@@ -18,6 +19,7 @@ const
   doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
   bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
   sea_pics    = "https://source.unsplash.com/collection/2160165/99x99"  # 480x480
+  nimble_rss  = "https://nimble.directory/packages.xml"
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -31,6 +33,20 @@ let
   start_time = cpuTime()
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
+
+  cmd_cat      = parseBool(config_ini.getSectionValue("commands", "cat"))
+  cmd_dog      = parseBool(config_ini.getSectionValue("commands", "dog"))
+  cmd_bigcat   = parseBool(config_ini.getSectionValue("commands", "bigcat"))
+  cmd_sea      = parseBool(config_ini.getSectionValue("commands", "sea"))
+  cmd_coc      = parseBool(config_ini.getSectionValue("commands", "coc"))
+  cmd_motd     = parseBool(config_ini.getSectionValue("commands", "motd"))
+  cmd_help     = parseBool(config_ini.getSectionValue("commands", "help"))
+  cmd_ping     = parseBool(config_ini.getSectionValue("commands", "ping"))
+  cmd_about    = parseBool(config_ini.getSectionValue("commands", "about"))
+  cmd_uptime   = parseBool(config_ini.getSectionValue("commands", "uptime"))
+  cmd_donate   = parseBool(config_ini.getSectionValue("commands", "donate"))
+  cmd_datetime = parseBool(config_ini.getSectionValue("commands", "datetime"))
+
   server_cmd_ip    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
   server_cmd_df    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
   server_cmd_free  = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "free"))
@@ -38,6 +54,7 @@ let
   server_cmd_lsusb = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lsusb"))
   server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
   server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
+
   api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
 
@@ -92,25 +109,25 @@ proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
-      message = responz.headers["location"].split("?")[0]
+      message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
 proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
-      message = responz.headers["location"].split("?")[0]
+      message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
 proc bigcatHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(bigcat_pics)
-      message = responz.headers["location"].split("?")[0]
+      message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
 proc seaHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(sea_pics)
-      message = responz.headers["location"].split("?")[0]
+      message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
@@ -190,34 +207,26 @@ proc main*() {.async.} =
 
   bot.onUpdate(handleUpdate(bot))
 
-  bot.onCommand("cat", catHandler(bot))
-  bot.onCommand("dog", dogHandler(bot))
-  bot.onCommand("bigcat", bigcatHandler(bot))
-  bot.onCommand("sea", seaHandler(bot))
-  bot.onCommand("coc", cocHandler(bot))
-  bot.onCommand("motd", motdHandler(bot))
-  bot.onCommand("help", helpHandler(bot))
-  bot.onCommand("ping", pingHandler(bot))
-  bot.onCommand("about", aboutHandler(bot))
-  bot.onCommand("uptime", uptimeHandler(bot))
-  bot.onCommand("donate", donateHandler(bot))
-  bot.onCommand("datetime", datetimeHandler(bot))
-
+  if cmd_cat:      bot.onCommand("cat", catHandler(bot))
+  if cmd_dog:      bot.onCommand("dog", dogHandler(bot))
+  if cmd_bigcat:   bot.onCommand("bigcat", bigcatHandler(bot))
+  if cmd_sea:      bot.onCommand("sea", seaHandler(bot))
+  if cmd_coc:      bot.onCommand("coc", cocHandler(bot))
+  if cmd_motd:     bot.onCommand("motd", motdHandler(bot))
+  if cmd_help:     bot.onCommand("help", helpHandler(bot))
+  if cmd_ping:     bot.onCommand("ping", pingHandler(bot))
+  if cmd_about:    bot.onCommand("about", aboutHandler(bot))
+  if cmd_uptime:   bot.onCommand("uptime", uptimeHandler(bot))
+  if cmd_donate:   bot.onCommand("donate", donateHandler(bot))
+  if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
   when defined(linux):
-    if server_cmd_ip:
-      bot.onCommand("ip", ipHandler(bot))
-    if server_cmd_df:
-      bot.onCommand("df", dfHandler(bot))
-    if server_cmd_free:
-      bot.onCommand("free", freeHandler(bot))
-    if server_cmd_lshw:
-      bot.onCommand("lshw", lshwHandler(bot))
-    if server_cmd_lsusb:
-      bot.onCommand("lsusb", lsusbHandler(bot))
-    if server_cmd_lspci:
-      bot.onCommand("lspci", lspciHandler(bot))
-    if server_cmd_public_ip:
-      bot.onCommand("public_ip", public_ipHandler(bot))
+    if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
+    if server_cmd_df:        bot.onCommand("df", dfHandler(bot))
+    if server_cmd_free:      bot.onCommand("free", freeHandler(bot))
+    if server_cmd_lshw:      bot.onCommand("lshw", lshwHandler(bot))
+    if server_cmd_lsusb:     bot.onCommand("lsusb", lsusbHandler(bot))
+    if server_cmd_lspci:     bot.onCommand("lspci", lspciHandler(bot))
+    if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler(bot))
 
   bot.poll(polling_interval)
 

@@ -4,13 +4,28 @@ api_key = ""
 polling_interval = 500
 
 
+# Enable / Disable builtin basic Commands.
+[commands]
+cat      = true
+dog      = true
+bigcat   = true
+sea      = true
+coc      = true
+motd     = true
+help     = true
+ping     = true
+about    = true
+uptime   = true
+donate   = true
+datetime = true
+
+
 # Enable / Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
 [linux_server_admin_commands]
-ip           = true
-df           = true
-free         = true
-lshw         = true
-lsusb        = true
-lspci        = true
-# Allow any user to see the current Servers Public IP.
-public_ip    = true
+ip        = true
+df        = true
+free      = true
+lshw      = true
+lsusb     = true
+lspci     = true
+public_ip = true  # Allow any user to see the current Servers Public IP.
