@@ -14,8 +14,8 @@ const
   ☑️ *Bot uses:*    """
   temp_folder = getTempDir()
   pub_ip_api  = "https://api.ipify.org"
-  kitten_pics = "https://source.unsplash.com/collection/139386/480x480"
-  doge_pics   = "https://source.unsplash.com/collection/1301659/480x480"
+  kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
+  doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -90,13 +90,13 @@ proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
-      message = responz.headers["location"]
+      message = responz.headers["location"].split("?")[0]
 
 proc dogHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
-      message = responz.headers["location"]
+      message = responz.headers["location"].split("?")[0]
 
 proc public_ipHandler(bot: Telebot): CommandCallback =
   handlerizer():
