@@ -1,7 +1,9 @@
-import asyncdispatch, httpclient, logging, json, options, ospaths, osproc
-import parsecfg, strformat, strutils, terminal, times
+import
+  asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg,
+  strformat, strutils, terminal, times, random
 import telebot  # nimble install telebot https://nimble.directory/pkg/telebot
 # import nimprof
+
 
 const
   about_texts = fmt"""*Nim Telegram Bot* 🤖
@@ -18,8 +20,7 @@ const
   kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
   doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
   bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
-  sea_pics    = "https://source.unsplash.com/collection/2160165/99x99"  # 480x480
-  nimble_rss  = "https://nimble.directory/packages.xml"
+  sea_pics    = "https://source.unsplash.com/collection/2160165/99x99" # 480x480
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -33,6 +34,7 @@ let
   start_time = cpuTime()
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
+  cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
 
   cmd_cat      = parseBool(config_ini.getSectionValue("commands", "cat"))
   cmd_dog      = parseBool(config_ini.getSectionValue("commands", "dog"))
@@ -55,7 +57,17 @@ let
   server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
   server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
 
-  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
+  cmd_bash0 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin0_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin0_command"))
+  cmd_bash1 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin1_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin1_command"))
+  cmd_bash2 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin2_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin2_command"))
+  cmd_bash3 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin3_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin3_command"))
+  cmd_bash4 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin4_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin4_command"))
+  cmd_bash5 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin5_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin5_command"))
+  cmd_bash6 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin6_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin6_command"))
+  cmd_bash7 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_command"))
+  cmd_bash8 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_command"))
+  cmd_bash9 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_command"))
+  # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
 
 var counter: int
@@ -90,7 +102,6 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
 #       discard bot.send(message)
 
   result = cb
-
 
 template handlerizer(body: untyped): untyped =
   proc cb(e: Command) {.async.} =
@@ -195,13 +206,55 @@ when defined(linux):
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
 
+  proc cmd_bash0Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash1Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash2Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash3Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash4Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash5Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash6Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash7Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash8Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+  proc cmd_bash9Handler(bot: Telebot, command: string): CommandCallback =
+    handlerizer():
+      let message = fmt"""`{execCmdEx(command)[0]}`"""
+
+
 proc main*() {.async.} =
+  ## Main loop of the bot.
+  if cli_colors:
+    randomize()
+    setBackgroundColor(bgBlack)
+    setForegroundColor([fgRed, fgGreen, fgYellow, fgBlue, fgMagenta, fgCyan, fgWhite].rand)
 
   addHandler(newConsoleLogger(fmtStr="$time $levelname "))
-
-  setBackgroundColor(bgBlack)
-  setForegroundColor(fgCyan)
-  defer: resetAttributes()
 
   let bot = newTeleBot(api_key)
 
@@ -219,6 +272,7 @@ proc main*() {.async.} =
   if cmd_uptime:   bot.onCommand("uptime", uptimeHandler(bot))
   if cmd_donate:   bot.onCommand("donate", donateHandler(bot))
   if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
+
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
     if server_cmd_df:        bot.onCommand("df", dfHandler(bot))
@@ -227,6 +281,27 @@ proc main*() {.async.} =
     if server_cmd_lsusb:     bot.onCommand("lsusb", lsusbHandler(bot))
     if server_cmd_lspci:     bot.onCommand("lspci", lspciHandler(bot))
     if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler(bot))
+
+    if cmd_bash0.name != "" and cmd_bash0.command != "":
+      bot.onCommand($cmd_bash0.name, cmd_bash0Handler(bot, cmd_bash0.command))
+    if cmd_bash1.name != "" and cmd_bash1.command != "":
+      bot.onCommand($cmd_bash1.name, cmd_bash0Handler(bot, cmd_bash1.command))
+    if cmd_bash2.name != "" and cmd_bash2.command != "":
+      bot.onCommand($cmd_bash2.name, cmd_bash0Handler(bot, cmd_bash2.command))
+    if cmd_bash3.name != "" and cmd_bash3.command != "":
+      bot.onCommand($cmd_bash3.name, cmd_bash0Handler(bot, cmd_bash3.command))
+    if cmd_bash4.name != "" and cmd_bash4.command != "":
+      bot.onCommand($cmd_bash4.name, cmd_bash0Handler(bot, cmd_bash4.command))
+    if cmd_bash5.name != "" and cmd_bash5.command != "":
+      bot.onCommand($cmd_bash5.name, cmd_bash0Handler(bot, cmd_bash5.command))
+    if cmd_bash6.name != "" and cmd_bash6.command != "":
+      bot.onCommand($cmd_bash6.name, cmd_bash0Handler(bot, cmd_bash6.command))
+    if cmd_bash7.name != "" and cmd_bash7.command != "":
+      bot.onCommand($cmd_bash7.name, cmd_bash0Handler(bot, cmd_bash7.command))
+    if cmd_bash8.name != "" and cmd_bash8.command != "":
+      bot.onCommand($cmd_bash8.name, cmd_bash0Handler(bot, cmd_bash8.command))
+    if cmd_bash9.name != "" and cmd_bash9.command != "":
+      bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
 
   bot.poll(polling_interval)
 
