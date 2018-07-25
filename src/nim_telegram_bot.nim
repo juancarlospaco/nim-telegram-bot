@@ -68,7 +68,7 @@ let
   cmd_bash8 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_command"))
   cmd_bash9 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_command"))
   # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
-  polling_interval: range[99..999] = parseInt(config_ini.getSectionValue("", "polling_interval")).int32
+  polling_interval: int8 = parseInt(config_ini.getSectionValue("", "polling_interval")).int8
 
 var counter: int
 
@@ -303,7 +303,7 @@ proc main*() {.async.} =
     if cmd_bash9.name != "" and cmd_bash9.command != "":
       bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
 
-  bot.poll(polling_interval)
+  bot.poll(polling_interval * 1000)
 
 
 when isMainModule:
