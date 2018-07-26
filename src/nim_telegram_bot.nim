@@ -303,7 +303,7 @@ proc main*() {.async.} =
     if cmd_bash9.name != "" and cmd_bash9.command != "":
       bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
 
-  bot.poll(polling_interval * 1000)
+  bot.poll(int32(polling_interval * 1000))
 
 
 when isMainModule:
