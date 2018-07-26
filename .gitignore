@@ -3,5 +3,5 @@ nimcache/
 *.kate-swp
 src/nim_telegram_bot
 config.ini
-downloads/*.md
-downloads/*.ini
+downloads/
+build/
