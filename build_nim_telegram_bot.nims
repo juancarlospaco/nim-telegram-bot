@@ -17,4 +17,4 @@ exec "sha1sum --tag build/nim_telegram_bot.exe > build/nim_telegram_bot.exe.sha1
 exec "sha512sum --tag build/nim_telegram_bot.exe > build/nim_telegram_bot.exe.sha512"
 # exec "keybase sign --infile build/nim_telegram_bot.exe --outfile build/nim_telegram_bot.exe.asc"
 
-exec "chmod --verbose -w build/*"
+# exec "chmod --verbose -w build/*"
