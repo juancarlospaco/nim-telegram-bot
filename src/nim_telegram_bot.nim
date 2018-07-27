@@ -1,6 +1,6 @@
 import
   asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg,
-  strformat, strutils, terminal, times, random
+  strformat, strutils, terminal, times, random, posix
 import telebot  # nimble install telebot https://nimble.directory/pkg/telebot
 # import nimprof
 
@@ -302,6 +302,11 @@ proc main*() {.async.} =
       bot.onCommand($cmd_bash8.name, cmd_bash0Handler(bot, cmd_bash8.command))
     if cmd_bash9.name != "" and cmd_bash9.command != "":
       bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
+
+    try:
+      discard nice(19.cint)  # smooth cpu priority
+    except Exception:
+      discard
 
   bot.poll(int32(polling_interval * 1000))
 
