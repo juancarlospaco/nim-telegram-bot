@@ -73,6 +73,7 @@ Example:
 
 - [Nim](https://nim-lang.org/install_unix.html) `>= 0.18.0`
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
+- [OpenExchangeRates](https://github.com/juancarlospaco/nim-openexchangerates#nim-openexchangerates)
 
 
 ### Single File
