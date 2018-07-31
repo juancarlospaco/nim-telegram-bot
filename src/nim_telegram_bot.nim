@@ -74,7 +74,7 @@ let
   oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
   oer_round = parseBool(config_ini.getSectionValue("openexchangerates", "round_prices"))
   # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
-  polling_interval: int8 = parseInt(config_ini.getSectionValue("", "polling_interval")).int8
+  polling_interval = int32(parseInt(config_ini.getSectionValue("", "polling_interval")).int8 * 1000)
 
 
 var counter: int
@@ -327,7 +327,7 @@ proc main*() {.async.} =
     except Exception:
       discard
 
-  bot.poll(int32(polling_interval * 1000))
+  bot.poll(polling_interval)
 
 
 when isMainModule:

@@ -27,6 +27,7 @@ about    = true
 uptime   = true
 donate   = true
 datetime = true
+dollar   = true
 
 
 # Enable / Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
