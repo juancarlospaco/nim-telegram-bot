@@ -75,6 +75,11 @@ Example:
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
 - [OpenExchangeRates](https://github.com/juancarlospaco/nim-openexchangerates#nim-openexchangerates)
 
+**Optional** For Photos on-demand:
+
+- 1 Working USB WebCam Camera on `/dev/video0`.
+- FFMPEG (Linux package, with WebP support).
+
 
 ### Single File
 

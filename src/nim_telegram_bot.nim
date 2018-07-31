@@ -355,10 +355,7 @@ proc main*() {.async.} =
     if cmd_bash9.name != "" and cmd_bash9.command != "":
       bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
 
-    try:
-      discard nice(19.cint)  # smooth cpu priority
-    except Exception:
-      discard
+    discard nice(19.cint)  # smooth cpu priority
 
   bot.poll(polling_interval)
 
