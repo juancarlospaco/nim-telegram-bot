@@ -133,7 +133,6 @@ template handlerizer(body: untyped): untyped =
 template handlerizerPhoto(body: untyped): untyped =
   proc cb(e: Command) {.async.} =
     inc counter
-    var photo_caption = $now()
     body
     var msg = newPhoto(e.message.chat.id, photo_path)
     msg.caption = photo_caption
@@ -247,11 +246,13 @@ when defined(linux):
 
   proc camHandler(bot: Telebot): CommandCallback =
     discard execCmdEx(if cam_blur: cam_ffmepg_blur else: cam_ffmepg)
-    var path = "file://" & ffmpeg_outp
-    if cam_caption != "":
-      var photo_caption = cam_caption.strip()
+    let
+      path = "file://" & ffmpeg_outp
+      caption = if cam_caption != "": cam_caption.strip() else: $now()
     handlerizerPhoto():
-      let photo_path = path
+      let
+        photo_path = path
+        photo_caption = caption
 
 
   proc cmd_bash0Handler(bot: Telebot, command: string): CommandCallback =
