@@ -30,6 +30,15 @@ datetime = true
 dollar   = true
 
 
+[linux_server_camera]
+# Enable / Disable take Photos on-demand using the USB WebCam Camera, Blurred by default, Requires FFMPEG and /dev/video0
+cam = true
+# Enable / Disable Blurring the photos for privacy.
+blur = true
+# Photo Caption text, if empty string then is ISO-format current date & time.
+photo_caption = ""
+
+
 # Enable / Disable Server Linux-only SysAdmin-only Commands (free,df,lshw,etc)
 [linux_server_admin_commands]
 ip        = true

@@ -22,6 +22,11 @@ const
   doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
   bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
   sea_pics    = "https://source.unsplash.com/collection/2160165/99x99" # 480x480
+  ffmpeg_base = r"ffmpeg -loglevel warning -y -an -sn -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 "
+  ffmpeg_blur = r"-vf 'boxblur=luma_radius=min(h\,w)/10:luma_power=1:chroma_radius=min(cw\,ch)/10:chroma_power=1' "
+  ffmpeg_outp = temp_folder / "nim_telegram_bot_webcam.webp"
+  cam_ffmepg_blur = ffmpeg_base & ffmpeg_blur & ffmpeg_outp
+  cam_ffmepg = ffmpeg_base & ffmpeg_outp
   helps_texts = readFile("help_text.md")      # External *.md files.
   coc_text =    readFile("coc_text.md")
   motd_text =   readFile("motd_text.md")
@@ -73,6 +78,10 @@ let
   oer_api_key = config_ini.getSectionValue("openexchangerates", "api_key")
   oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
   oer_round = parseBool(config_ini.getSectionValue("openexchangerates", "round_prices"))
+
+  cam_enabled = parseBool(config_ini.getSectionValue("linux_server_camera", "cam"))
+  cam_blur    = parseBool(config_ini.getSectionValue("linux_server_camera", "blur"))
+  cam_caption = config_ini.getSectionValue("linux_server_camera", "photo_caption")
   # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval = int32(parseInt(config_ini.getSectionValue("", "polling_interval")).int8 * 1000)
 
@@ -118,8 +127,21 @@ template handlerizer(body: untyped): untyped =
     msg.disableNotification = true
     # message.replyToMessageId = e.message.messageId
     msg.parseMode = "markdown"
-    discard bot.send(msg)  # Sometimes Telegram API just ignores requests (?).
+    discard bot.send(msg)
   result = cb
+
+template handlerizerPhoto(body: untyped): untyped =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    var photo_caption = $now()
+    body
+    var msg = newPhoto(e.message.chat.id, photo_path)
+    msg.caption = photo_caption
+    msg.disableNotification = true
+    # message.replyToMessageId = e.message.messageId
+    discard await bot.send(msg)
+  result = cb
+
 
 proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
@@ -223,6 +245,14 @@ when defined(linux):
     handlerizer():
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
+  proc camHandler(bot: Telebot): CommandCallback =
+    discard execCmdEx(if cam_blur: cam_ffmepg_blur else: cam_ffmepg)
+    var path = "file://" & ffmpeg_outp
+    if cam_caption != "":
+      var photo_caption = cam_caption.strip()
+    handlerizerPhoto():
+      let photo_path = path
+
 
   proc cmd_bash0Handler(bot: Telebot, command: string): CommandCallback =
     handlerizer():
@@ -300,6 +330,8 @@ proc main*() {.async.} =
     if server_cmd_lsusb:     bot.onCommand("lsusb", lsusbHandler(bot))
     if server_cmd_lspci:     bot.onCommand("lspci", lspciHandler(bot))
     if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler(bot))
+
+    if cam_enabled: bot.onCommand("cam", camHandler(bot))
 
     if cmd_bash0.name != "" and cmd_bash0.command != "":
       bot.onCommand($cmd_bash0.name, cmd_bash0Handler(bot, cmd_bash0.command))
