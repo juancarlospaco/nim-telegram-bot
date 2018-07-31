@@ -1,7 +1,8 @@
 import
   asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg,
   strformat, strutils, terminal, times, random, posix
-import telebot  # nimble install telebot https://nimble.directory/pkg/telebot
+import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
+import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 # import nimprof
 
 
@@ -48,6 +49,7 @@ let
   cmd_uptime   = parseBool(config_ini.getSectionValue("commands", "uptime"))
   cmd_donate   = parseBool(config_ini.getSectionValue("commands", "donate"))
   cmd_datetime = parseBool(config_ini.getSectionValue("commands", "datetime"))
+  cmd_dollar   = parseBool(config_ini.getSectionValue("commands", "dollar"))
 
   server_cmd_ip    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
   server_cmd_df    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
@@ -67,41 +69,46 @@ let
   cmd_bash7 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_command"))
   cmd_bash8 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_command"))
   cmd_bash9 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_command"))
+
+  oer_api_key = config_ini.getSectionValue("openexchangerates", "api_key")
+  oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
+  oer_round = parseBool(config_ini.getSectionValue("openexchangerates", "round_prices"))
   # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   polling_interval: int8 = parseInt(config_ini.getSectionValue("", "polling_interval")).int8
+
 
 var counter: int
 
 
-proc handleUpdate(bot: TeleBot): UpdateCallback =
-  proc cb(e: Update) {.async.} =
-    var response = e.message.get
-
-    if response.text.isSome:  # Echo text message.
-      let
-        text = response.text.get
-      var message = newMessage(response.chat.id, text)
-      message.disableNotification = true
-      message.replyToMessageId = response.messageId
-      message.parseMode = "markdown"
-      discard bot.send(message)
-
-#     if response.document.isSome:   # files
+# proc handleUpdate(bot: TeleBot): UpdateCallback =
+#   proc cb(e: Update) {.async.} =
+#     var response = e.message.get
+#
+#     if response.text.isSome:  # Echo text message.
 #       let
-#         code = response.document.get
-#
-#       echo code.file_name
-#       echo code.mime_type
-#       echo code.file_id
-#       echo code.file_size
-#
-#       var message = newMessage(response.chat.id, $code)
+#         text = response.text.get
+#       var message = newMessage(response.chat.id, text)
 #       message.disableNotification = true
 #       message.replyToMessageId = response.messageId
 #       message.parseMode = "markdown"
 #       discard bot.send(message)
-
-  result = cb
+#
+# #     if response.document.isSome:   # files
+# #       let
+# #         code = response.document.get
+# #
+# #       echo code.file_name
+# #       echo code.mime_type
+# #       echo code.file_id
+# #       echo code.file_size
+# #
+# #       var message = newMessage(response.chat.id, $code)
+# #       message.disableNotification = true
+# #       message.replyToMessageId = response.messageId
+# #       message.parseMode = "markdown"
+# #       discard bot.send(message)
+#
+#   result = cb
 
 template handlerizer(body: untyped): untyped =
   proc cb(e: Command) {.async.} =
@@ -109,11 +116,9 @@ template handlerizer(body: untyped): untyped =
     body
     var msg = newMessage(e.message.chat.id, $message.strip())
     msg.disableNotification = true
+    # message.replyToMessageId = e.message.messageId
     msg.parseMode = "markdown"
-    try:
-      discard bot.send(msg)  # Sometimes Telegram API just ignores requests (?).
-    except Exception:
-      discard
+    discard bot.send(msg)  # Sometimes Telegram API just ignores requests (?).
   result = cb
 
 proc catHandler(bot: Telebot): CommandCallback =
@@ -178,6 +183,19 @@ proc donateHandler(bot: Telebot): CommandCallback =
 proc motdHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = motd_text
+
+proc dollarHandler(bot: Telebot): CommandCallback =
+  let
+    oer_client = AsyncOER(timeout: 3, api_key: oer_api_key, base: "USD", local_base: "",  # "ARS",
+                          round_float: oer_round, prettyprint: false, show_alternative: true)
+    money_json = waitFor oer_client.latest()      # Updated Prices.
+    names_json = waitFor oer_client.currencies()  # Friendly Names.
+  var dineros = ""
+  for crrncy in money_json.pairs:
+    if crrncy[0] in oer_currenc:
+      dineros.add fmt"*{crrncy[0]}* _{names_json[crrncy[0]]}_: `{crrncy[1]}`,  "
+  handlerizer():
+    let message = dineros
 
 
 when defined(linux):
@@ -258,7 +276,7 @@ proc main*() {.async.} =
 
   let bot = newTeleBot(api_key)
 
-  bot.onUpdate(handleUpdate(bot))
+  #bot.onUpdate(handleUpdate(bot))
 
   if cmd_cat:      bot.onCommand("cat", catHandler(bot))
   if cmd_dog:      bot.onCommand("dog", dogHandler(bot))
@@ -272,6 +290,7 @@ proc main*() {.async.} =
   if cmd_uptime:   bot.onCommand("uptime", uptimeHandler(bot))
   if cmd_donate:   bot.onCommand("donate", donateHandler(bot))
   if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
+  if cmd_dollar:   bot.onCommand("dollar", dollarHandler(bot))
 
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))

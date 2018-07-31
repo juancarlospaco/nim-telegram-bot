@@ -4,6 +4,15 @@ api_key = ""
 polling_interval = 1
 
 
+[openexchangerates]
+# OpenExchangeRates API Key, get for Free at https://openexchangerates.org/account/app-ids
+api_key = ""
+# List of currencies the Bot will show when the Command is used, standard 3 letter names, order does not matter (full list is too long, so you must choose a few).
+currencies = "EUR,BGP,RUB,ARS,BRL,CNY,JPY,BTC,ETH,LTC,DOGE,XAU"
+# Prices are floats, true rounds to 2 decimals, false not round (+6 decimals).
+round_prices = true
+
+
 # Enable / Disable builtin basic Commands.
 [commands]
 cat      = true
