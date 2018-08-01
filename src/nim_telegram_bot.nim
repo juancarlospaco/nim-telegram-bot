@@ -75,6 +75,17 @@ let
   cmd_bash8 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_command"))
   cmd_bash9 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_command"))
 
+  cmd_geo0 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_lon")))
+  cmd_geo1 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_lon")))
+  cmd_geo2 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_lon")))
+  cmd_geo3 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_lon")))
+  cmd_geo4 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_lon")))
+  cmd_geo5 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_lon")))
+  cmd_geo6 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_lon")))
+  cmd_geo7 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_lon")))
+  cmd_geo8 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_lon")))
+  cmd_geo9 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_lon")))
+
   oer_api_key = config_ini.getSectionValue("openexchangerates", "api_key")
   oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
   oer_round = parseBool(config_ini.getSectionValue("openexchangerates", "round_prices"))
@@ -141,6 +152,22 @@ template handlerizerPhoto(body: untyped): untyped =
     discard await bot.send(msg)
   result = cb
 
+template handlerizerLocation(body: untyped): untyped =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    body
+    let
+      geo_uri = "*GEO URI:* geo:$1,$2    ".format(latitud, longitud)
+      osm_url = "*OSM URL:* https://www.openstreetmap.org/?mlat=$1&mlon=$2".format(latitud, longitud)
+    var
+      msg = newMessage(e.message.chat.id,  geo_uri & osm_url)
+      geo_msg = newLocation(e.message.chat.id, longitud, latitud)
+    msg.disableNotification = true
+    geo_msg.disableNotification = true
+    msg.parseMode = "markdown"
+    discard bot.send(geo_msg)
+    discard bot.send(msg)
+  result = cb
 
 proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
@@ -218,6 +245,12 @@ proc dollarHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = dineros
 
+proc geoHandler(bot: Telebot, latitud, longitud: float): CommandCallback =
+  handlerizerLocation():
+    let
+      latitud = latitud
+      longitud = longitud
+
 
 when defined(linux):
   proc dfHandler(bot: Telebot): CommandCallback =
@@ -254,44 +287,7 @@ when defined(linux):
         photo_path = path
         photo_caption = caption
 
-
-  proc cmd_bash0Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash1Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash2Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash3Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash4Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash5Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash6Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash7Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash8Handler(bot: Telebot, command: string): CommandCallback =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
-
-  proc cmd_bash9Handler(bot: Telebot, command: string): CommandCallback =
+  proc cmd_bashHandler(bot: Telebot, command: string): CommandCallback =
     handlerizer():
       let message = fmt"""`{execCmdEx(command)[0]}`"""
 
@@ -323,6 +319,17 @@ proc main*() {.async.} =
   if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
   if cmd_dollar:   bot.onCommand("dollar", dollarHandler(bot))
 
+  if cmd_geo0.name != "": bot.onCommand(cmd_geo0.name, geoHandler(bot, cmd_geo0.lat, cmd_geo0.lon))
+  if cmd_geo1.name != "": bot.onCommand(cmd_geo1.name, geoHandler(bot, cmd_geo1.lat, cmd_geo1.lon))
+  if cmd_geo2.name != "": bot.onCommand(cmd_geo2.name, geoHandler(bot, cmd_geo2.lat, cmd_geo2.lon))
+  if cmd_geo3.name != "": bot.onCommand(cmd_geo3.name, geoHandler(bot, cmd_geo3.lat, cmd_geo3.lon))
+  if cmd_geo4.name != "": bot.onCommand(cmd_geo4.name, geoHandler(bot, cmd_geo4.lat, cmd_geo4.lon))
+  if cmd_geo5.name != "": bot.onCommand(cmd_geo5.name, geoHandler(bot, cmd_geo5.lat, cmd_geo5.lon))
+  if cmd_geo6.name != "": bot.onCommand(cmd_geo6.name, geoHandler(bot, cmd_geo6.lat, cmd_geo6.lon))
+  if cmd_geo7.name != "": bot.onCommand(cmd_geo7.name, geoHandler(bot, cmd_geo7.lat, cmd_geo7.lon))
+  if cmd_geo8.name != "": bot.onCommand(cmd_geo8.name, geoHandler(bot, cmd_geo8.lat, cmd_geo8.lon))
+  if cmd_geo9.name != "": bot.onCommand(cmd_geo9.name, geoHandler(bot, cmd_geo9.lat, cmd_geo9.lon))
+
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
     if server_cmd_df:        bot.onCommand("df", dfHandler(bot))
@@ -335,25 +342,25 @@ proc main*() {.async.} =
     if cam_enabled: bot.onCommand("cam", camHandler(bot))
 
     if cmd_bash0.name != "" and cmd_bash0.command != "":
-      bot.onCommand($cmd_bash0.name, cmd_bash0Handler(bot, cmd_bash0.command))
+      bot.onCommand($cmd_bash0.name, cmd_bashHandler(bot, cmd_bash0.command))
     if cmd_bash1.name != "" and cmd_bash1.command != "":
-      bot.onCommand($cmd_bash1.name, cmd_bash0Handler(bot, cmd_bash1.command))
+      bot.onCommand($cmd_bash1.name, cmd_bashHandler(bot, cmd_bash1.command))
     if cmd_bash2.name != "" and cmd_bash2.command != "":
-      bot.onCommand($cmd_bash2.name, cmd_bash0Handler(bot, cmd_bash2.command))
+      bot.onCommand($cmd_bash2.name, cmd_bashHandler(bot, cmd_bash2.command))
     if cmd_bash3.name != "" and cmd_bash3.command != "":
-      bot.onCommand($cmd_bash3.name, cmd_bash0Handler(bot, cmd_bash3.command))
+      bot.onCommand($cmd_bash3.name, cmd_bashHandler(bot, cmd_bash3.command))
     if cmd_bash4.name != "" and cmd_bash4.command != "":
-      bot.onCommand($cmd_bash4.name, cmd_bash0Handler(bot, cmd_bash4.command))
+      bot.onCommand($cmd_bash4.name, cmd_bashHandler(bot, cmd_bash4.command))
     if cmd_bash5.name != "" and cmd_bash5.command != "":
-      bot.onCommand($cmd_bash5.name, cmd_bash0Handler(bot, cmd_bash5.command))
+      bot.onCommand($cmd_bash5.name, cmd_bashHandler(bot, cmd_bash5.command))
     if cmd_bash6.name != "" and cmd_bash6.command != "":
-      bot.onCommand($cmd_bash6.name, cmd_bash0Handler(bot, cmd_bash6.command))
+      bot.onCommand($cmd_bash6.name, cmd_bashHandler(bot, cmd_bash6.command))
     if cmd_bash7.name != "" and cmd_bash7.command != "":
-      bot.onCommand($cmd_bash7.name, cmd_bash0Handler(bot, cmd_bash7.command))
+      bot.onCommand($cmd_bash7.name, cmd_bashHandler(bot, cmd_bash7.command))
     if cmd_bash8.name != "" and cmd_bash8.command != "":
-      bot.onCommand($cmd_bash8.name, cmd_bash0Handler(bot, cmd_bash8.command))
+      bot.onCommand($cmd_bash8.name, cmd_bashHandler(bot, cmd_bash8.command))
     if cmd_bash9.name != "" and cmd_bash9.command != "":
-      bot.onCommand($cmd_bash9.name, cmd_bash0Handler(bot, cmd_bash9.command))
+      bot.onCommand($cmd_bash9.name, cmd_bashHandler(bot, cmd_bash9.command))
 
     discard nice(19.cint)  # smooth cpu priority
 

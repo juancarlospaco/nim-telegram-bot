@@ -74,3 +74,41 @@ bash_plugin9_name    = ""
 bash_plugin9_command = ""
 # bash_pluginX_name    = "custom"   # Example Name.        --\___Example Plugin.
 # bash_pluginX_command = "echo 42"  # Example Bash Command --/
+
+
+
+# Share Coordinates of Geographical Points Of Interest (POI) using Latitude,Longitude floating point numbers, max 10 plugins, empty string = Disabled.
+[geo_location_sharing]
+geo_plugin0_name = ""
+geo_plugin0_lat  = 0.0
+geo_plugin0_lon  = 0.0
+geo_plugin1_name = ""
+geo_plugin1_lat  = 0.0
+geo_plugin1_lon  = 0.0
+geo_plugin2_name = ""
+geo_plugin2_lat  = 0.0
+geo_plugin2_lon  = 0.0
+geo_plugin3_name = ""
+geo_plugin3_lat  = 0.0
+geo_plugin3_lon  = 0.0
+geo_plugin4_name = ""
+geo_plugin4_lat  = 0.0
+geo_plugin4_lon  = 0.0
+geo_plugin5_name = ""
+geo_plugin5_lat  = 0.0
+geo_plugin5_lon  = 0.0
+geo_plugin6_name = ""
+geo_plugin6_lat  = 0.0
+geo_plugin6_lon  = 0.0
+geo_plugin7_name = ""
+geo_plugin7_lat  = 0.0
+geo_plugin7_lon  = 0.0
+geo_plugin8_name = ""
+geo_plugin8_lat  = 0.0
+geo_plugin8_lon  = 0.0
+geo_plugin9_name = ""
+geo_plugin9_lat  = 0.0
+geo_plugin9_lon  = 0.0
+# geo_pluginX_name = "tokio3" ---\
+# geo_pluginX_lat = 42.00 ----------> Example Geo POI plugin, /tokio3 gives Lat=42.0, Lon=66.6
+# geo_pluginX_lon = 66.66 -------/
