@@ -93,17 +93,22 @@ let
   cam_enabled = parseBool(config_ini.getSectionValue("linux_server_camera", "cam"))
   cam_blur    = parseBool(config_ini.getSectionValue("linux_server_camera", "blur"))
   cam_caption = config_ini.getSectionValue("linux_server_camera", "photo_caption")
-  # api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
+  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
+  api_file = fmt"https://api.telegram.org/bot{api_key}/getFile?file_id="
   polling_interval = int32(parseInt(config_ini.getSectionValue("", "polling_interval")).int8 * 1000)
+  oer_client = AsyncOER(timeout: 3, api_key: oer_api_key, base: "USD", local_base: "",  # "ARS",
+                        round_float: oer_round, prettyprint: false, show_alternative: true)
 
 
 var counter: int
 
 
-# proc handleUpdate(bot: TeleBot): UpdateCallback =
-#   proc cb(e: Update) {.async.} =
-#     var response = e.message.get
-#
+proc handleUpdate(bot: TeleBot): UpdateCallback =
+  let
+    url = api_url
+    url_getfile = api_file
+  proc cb(e: Update) {.async.} =
+    var response = e.message.get
 #     if response.text.isSome:  # Echo text message.
 #       let
 #         text = response.text.get
@@ -112,23 +117,38 @@ var counter: int
 #       message.replyToMessageId = response.messageId
 #       message.parseMode = "markdown"
 #       discard bot.send(message)
-#
-# #     if response.document.isSome:   # files
-# #       let
-# #         code = response.document.get
-# #
-# #       echo code.file_name
-# #       echo code.mime_type
-# #       echo code.file_id
-# #       echo code.file_size
-# #
-# #       var message = newMessage(response.chat.id, $code)
-# #       message.disableNotification = true
-# #       message.replyToMessageId = response.messageId
-# #       message.parseMode = "markdown"
-# #       discard bot.send(message)
-#
-#   result = cb
+    if response.document.isSome:   # files
+      let
+        document = response.document.get
+        file_name = document.file_name.get
+        mime_type = document.mime_type.get
+        file_id = document.file_id
+        file_size = document.file_size.get
+        responz = await newAsyncHttpClient().get(url_getfile & file_id)
+        responz_body = await responz.body
+        file_path = parseJson(responz_body)["result"]["file_path"].getStr()
+        responx = await newAsyncHttpClient().get(url & file_path)
+        file_content = await responx.body
+        metadata_text = fmt"""*Processing file; Please wait!.* ⏳
+        *file_name:* `{file_name}`
+        *mime_type:* `{mime_type}`
+        *file_id:*   `{file_id}`
+        *file_size:* `{file_size}` Bytes
+        *file_path:* `{file_path}`
+        *owner:* {response.chat.first_name.get} {response.chat.last_name.get}"""
+
+      var message = newMessage(response.chat.id, metadata_text)
+      message.disableNotification = true
+      message.parseMode = "markdown"
+      discard bot.send(message)
+
+      if file_name.endsWith(".nim") and mime_type == "text/plain":
+        echo "compile nim"
+      else:
+        echo "plugins"
+
+  result = cb
+
 
 template handlerizer(body: untyped): untyped =
   proc cb(e: Command) {.async.} =
@@ -234,8 +254,6 @@ proc motdHandler(bot: Telebot): CommandCallback =
 
 proc dollarHandler(bot: Telebot): CommandCallback =
   let
-    oer_client = AsyncOER(timeout: 3, api_key: oer_api_key, base: "USD", local_base: "",  # "ARS",
-                          round_float: oer_round, prettyprint: false, show_alternative: true)
     money_json = waitFor oer_client.latest()      # Updated Prices.
     names_json = waitFor oer_client.currencies()  # Friendly Names.
   var dineros = ""
@@ -303,7 +321,7 @@ proc main*() {.async.} =
 
   let bot = newTeleBot(api_key)
 
-  #bot.onUpdate(handleUpdate(bot))
+  bot.onUpdate(handleUpdate(bot))
 
   if cmd_cat:      bot.onCommand("cat", catHandler(bot))
   if cmd_dog:      bot.onCommand("dog", dogHandler(bot))
