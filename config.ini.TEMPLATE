@@ -13,6 +13,17 @@ currencies = "EUR,BGP,RUB,ARS,BRL,CNY,JPY,BTC,ETH,LTC,DOGE,XAU"
 round_prices = true
 
 
+[nim_files_crosscompilation]
+# Maximum file size limit on Bytes of nim files to crosscompile, bigger files will be ignored.
+size_limit = 256000
+# Maximum number of lines limit of nim files to crosscompile, bigger files will be ignored.
+lines_limit = 1000
+# Nim compilation arguments for Linux compilation.
+linux_args = "-d:ssl"
+# Nim compilation parameters for Windows compilation.
+windows_args = "--gcc.exe:/usr/bin/x86_64-w64-mingw32-gcc --gcc.linkerexe:/usr/bin/x86_64-w64-mingw32-gcc -d:ssl"
+
+
 # Enable / Disable builtin basic Commands.
 [commands]
 cat      = true

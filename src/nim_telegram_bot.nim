@@ -17,6 +17,9 @@ const
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
   temp_folder = getTempDir()
+  strip_cmd   = "strip --verbose --strip-all"
+  upx_cmd     = "upx --best --ultra-brute"
+  sha_cmd     = "sha1sum --tag"
   pub_ip_api  = "https://api.ipify.org"
   kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
   doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
@@ -41,6 +44,11 @@ let
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
   cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
+
+  file_size_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "size_limit"))
+  file_lineno_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "lines_limit"))
+  linux_args = config_ini.getSectionValue("nim_files_crosscompilation", "linux_args")
+  windows_args = config_ini.getSectionValue("nim_files_crosscompilation", "windows_args")
 
   cmd_cat      = parseBool(config_ini.getSectionValue("commands", "cat"))
   cmd_dog      = parseBool(config_ini.getSectionValue("commands", "dog"))
@@ -99,7 +107,6 @@ let
   oer_client = AsyncOER(timeout: 3, api_key: oer_api_key, base: "USD", local_base: "",  # "ARS",
                         round_float: oer_round, prettyprint: false, show_alternative: true)
 
-
 var counter: int
 
 
@@ -107,6 +114,12 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
   let
     url = api_url
     url_getfile = api_file
+    linux_args = linux_args
+    windows_args = windows_args
+    strip_cmd = strip_cmd
+    upx_cmd = upx_cmd
+    sha_cmd = sha_cmd
+
   proc cb(e: Update) {.async.} =
     var response = e.message.get
 #     if response.text.isSome:  # Echo text message.
@@ -129,12 +142,20 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
         file_path = parseJson(responz_body)["result"]["file_path"].getStr()
         responx = await newAsyncHttpClient().get(url & file_path)
         file_content = await responx.body
-        metadata_text = fmt"""*Processing file; Please wait!.* ⏳
+        file_linecount = file_content.splitLines.len
+        size_remaining = file_size_limit - file_size
+        lineno_remaining = file_lineno_limit - file_linecount
+        file_tuple = (file_name: file_name, mime_type: mime_type, file_id: file_id,
+        file_path: file_path, file_size: file_size, file_linecount: file_linecount,
+        owner: fmt"{response.chat.first_name.get} {response.chat.last_name.get}",
+        file_content: file_content)
+        metadata_text = fmt"""⏳ *Processing file; Please wait!.* ⏳
         *file_name:* `{file_name}`
         *mime_type:* `{mime_type}`
         *file_id:*   `{file_id}`
-        *file_size:* `{file_size}` Bytes
         *file_path:* `{file_path}`
+        *file_size:* `{file_size}` Bytes _({size_remaining} below limit)_
+        *file_linecount:* `{file_linecount}` _({lineno_remaining} below limit)_
         *owner:* {response.chat.first_name.get} {response.chat.last_name.get}"""
 
       var message = newMessage(response.chat.id, metadata_text)
@@ -142,10 +163,45 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
       message.parseMode = "markdown"
       discard bot.send(message)
 
-      if file_name.endsWith(".nim") and mime_type == "text/plain":
-        echo "compile nim"
+      if size_remaining > 1 and lineno_remaining > 1:
+        if file_name.endsWith(".nim"):
+          let
+            temp_file_nim = temp_folder / file_tuple.file_name
+            temp_file_bin = temp_file_nim.replace(".nim", "")
+            temp_file_exe = temp_file_nim.replace(".nim", ".exe")
+          writeFile(temp_file_nim,  file_tuple.file_content)
+          var
+            output: string
+            exitCode: int
+          # Linux Compilation.
+          (output, exitCode) = execCmdEx(fmt"nim c -d:release --opt:size {linux_args} --out:{temp_file_bin} {temp_file_nim}")
+          if exitCode == 0:
+            (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_bin}")
+            if exitCode == 0:
+              (output, exitCode) = execCmdEx(fmt"{upx_cmd} {temp_file_bin}")
+              if exitCode == 0:
+                (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_bin}")
+                if exitCode == 0:
+                  var binary_lin = newDocument(response.chat.id, "file://" & temp_file_bin)
+                  binary_lin.caption = output.strip
+                  discard await bot.send(binary_lin)
+          # Windows Compilation.
+          (output, exitCode) = execCmdEx(fmt"nim c --cpu:amd64 --os:windows -d:release --opt:size {windows_args} --out:{temp_file_exe} {temp_file_nim}")
+          if exitCode == 0:
+            (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_exe}")
+            if exitCode == 0:
+              (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_exe}")
+              if exitCode == 0:
+                var binary_win = newDocument(response.chat.id, "file://" & temp_file_exe)
+                binary_win.caption = output.strip
+                discard await bot.send(binary_win)
+        else:
+          echo "TODO: Plugins should take it from here, WIP."
       else:
-        echo "plugins"
+        var mssg = newMessage(response.chat.id, "💩 *File is too big for Plugins to Process!* 💩")
+        mssg.disableNotification = true
+        mssg.parseMode = "markdown"
+        discard bot.send(mssg)
 
   result = cb
 
