@@ -17,7 +17,7 @@ const
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
   ☑️ *Bot uses:*    """
   temp_folder = getTempDir()
-  strip_cmd   = "strip --verbose --strip-all"
+  strip_cmd   = "strip --strip-all"
   upx_cmd     = "upx --best --ultra-brute"
   sha_cmd     = "sha1sum --tag"
   pub_ip_api  = "https://api.ipify.org"
