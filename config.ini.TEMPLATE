@@ -14,9 +14,9 @@ round_prices = true
 
 
 [nim_files_crosscompilation]
-# Maximum file size limit on Bytes of nim files to crosscompile, bigger files will be ignored.
+# Maximum file size limit on Bytes of nim files to crosscompile, bigger files will be ignored, 0 = disabled.
 size_limit = 256000
-# Maximum number of lines limit of nim files to crosscompile, bigger files will be ignored.
+# Maximum number of lines limit of nim files to crosscompile, bigger files will be ignored, 0 = disabled.
 lines_limit = 1000
 # Nim compilation arguments for Linux compilation.
 linux_args = "-d:ssl"
