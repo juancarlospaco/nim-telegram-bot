@@ -44,6 +44,7 @@ let
   plugins_folder = getCurrentDir() / "plugins"
   bash_plugins_folder = plugins_folder / "bash"
   static_plugins_folder = plugins_folder / "static"
+  geo_plugins_folder = plugins_folder / "geo"
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
   cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
@@ -74,28 +75,6 @@ let
   server_cmd_lsusb = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lsusb"))
   server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
   server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
-
-  cmd_bash0 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin0_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin0_command"))
-  cmd_bash1 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin1_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin1_command"))
-  cmd_bash2 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin2_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin2_command"))
-  cmd_bash3 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin3_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin3_command"))
-  cmd_bash4 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin4_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin4_command"))
-  cmd_bash5 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin5_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin5_command"))
-  cmd_bash6 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin6_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin6_command"))
-  cmd_bash7 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin7_command"))
-  cmd_bash8 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin8_command"))
-  cmd_bash9 = (name: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_name"), command: config_ini.getSectionValue("bash_plugin_commands", "bash_plugin9_command"))
-
-  cmd_geo0 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin0_lon")))
-  cmd_geo1 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin1_lon")))
-  cmd_geo2 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin2_lon")))
-  cmd_geo3 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin3_lon")))
-  cmd_geo4 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin4_lon")))
-  cmd_geo5 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin5_lon")))
-  cmd_geo6 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin6_lon")))
-  cmd_geo7 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin7_lon")))
-  cmd_geo8 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin8_lon")))
-  cmd_geo9 = (name: config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_name"), lat: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_lat")), lon: parseFloat(config_ini.getSectionValue("geo_location_sharing", "geo_plugin9_lon")))
 
   oer_api_key = config_ini.getSectionValue("openexchangerates", "api_key")
   oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
@@ -398,6 +377,7 @@ proc main*() {.async.} =
 
   createDir(bash_plugins_folder)
   createDir(static_plugins_folder)
+  createDir(geo_plugins_folder)
 
   let bot = newTeleBot(api_key)
 
@@ -417,20 +397,17 @@ proc main*() {.async.} =
   if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
   if cmd_dollar:   bot.onCommand("dollar", dollarHandler(bot))
 
-  if cmd_geo0.name != "": bot.onCommand(cmd_geo0.name, geoHandler(bot, cmd_geo0.lat, cmd_geo0.lon))
-  if cmd_geo1.name != "": bot.onCommand(cmd_geo1.name, geoHandler(bot, cmd_geo1.lat, cmd_geo1.lon))
-  if cmd_geo2.name != "": bot.onCommand(cmd_geo2.name, geoHandler(bot, cmd_geo2.lat, cmd_geo2.lon))
-  if cmd_geo3.name != "": bot.onCommand(cmd_geo3.name, geoHandler(bot, cmd_geo3.lat, cmd_geo3.lon))
-  if cmd_geo4.name != "": bot.onCommand(cmd_geo4.name, geoHandler(bot, cmd_geo4.lat, cmd_geo4.lon))
-  if cmd_geo5.name != "": bot.onCommand(cmd_geo5.name, geoHandler(bot, cmd_geo5.lat, cmd_geo5.lon))
-  if cmd_geo6.name != "": bot.onCommand(cmd_geo6.name, geoHandler(bot, cmd_geo6.lat, cmd_geo6.lon))
-  if cmd_geo7.name != "": bot.onCommand(cmd_geo7.name, geoHandler(bot, cmd_geo7.lat, cmd_geo7.lon))
-  if cmd_geo8.name != "": bot.onCommand(cmd_geo8.name, geoHandler(bot, cmd_geo8.lat, cmd_geo8.lon))
-  if cmd_geo9.name != "": bot.onCommand(cmd_geo9.name, geoHandler(bot, cmd_geo9.lat, cmd_geo9.lon))
-
   for static_file in walkFiles(static_plugins_folder / "/*.*"):
     let (dir, name, ext) = splitFile(static_file)
     bot.onCommand(name.toLowerAscii, staticHandler(bot, static_file))
+
+  for geo_file in walkFiles(geo_plugins_folder / "/*.ini"):
+    let
+      geo_ini = loadConfig(geo_file)
+      latitud = parseFloat(geo_ini.getSectionValue("", "latitude"))
+      longitu = parseFloat(geo_ini.getSectionValue("", "longitude"))
+      (dir, name, ext) = splitFile(geo_file)
+    bot.onCommand(name.toLowerAscii, geoHandler(bot, latitud, longitu))
 
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
