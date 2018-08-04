@@ -428,6 +428,10 @@ proc main*() {.async.} =
   if cmd_geo8.name != "": bot.onCommand(cmd_geo8.name, geoHandler(bot, cmd_geo8.lat, cmd_geo8.lon))
   if cmd_geo9.name != "": bot.onCommand(cmd_geo9.name, geoHandler(bot, cmd_geo9.lat, cmd_geo9.lon))
 
+  for static_file in walkFiles(static_plugins_folder / "/*.*"):
+    let (dir, name, ext) = splitFile(static_file)
+    bot.onCommand(name.toLowerAscii, staticHandler(bot, static_file))
+
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
     if server_cmd_df:        bot.onCommand("df", dfHandler(bot))
@@ -438,10 +442,6 @@ proc main*() {.async.} =
     if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler(bot))
 
     if cam_enabled: bot.onCommand("cam", camHandler(bot))
-
-    for static_file in walkFiles(static_plugins_folder / "/*.*"):
-      let (dir, name, ext) = splitFile(static_file)
-      bot.onCommand(name.toLowerAscii, staticHandler(bot, static_file))
 
     for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
       let (dir, name, ext) = splitFile(bash_file)
