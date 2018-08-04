@@ -1,6 +1,6 @@
 import
   asyncdispatch, httpclient, logging, json, options, ospaths, osproc, parsecfg,
-  strformat, strutils, terminal, times, random, posix
+  strformat, strutils, terminal, times, random, posix, os
 import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
 import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 # import nimprof
@@ -41,6 +41,9 @@ const
 
 let
   start_time = cpuTime()
+  plugins_folder = getCurrentDir() / "plugins"
+  bash_plugins_folder = plugins_folder / "bash"
+  static_plugins_folder = plugins_folder / "static"
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
   cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
@@ -121,6 +124,7 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
     sha_cmd = sha_cmd
 
   proc cb(e: Update) {.async.} =
+    inc counter
     var response = e.message.get
 #     if response.text.isSome:  # Echo text message.
 #       let
@@ -245,6 +249,17 @@ template handlerizerLocation(body: untyped): untyped =
     discard bot.send(msg)
   result = cb
 
+template handlerizerDocument(body: untyped): untyped =
+  proc cb(e: Command) {.async.} =
+    inc counter
+    body
+    var document = newDocument(e.message.chat.id, "file://" & document_file_path)
+    document.caption = document_caption.strip
+    document.disableNotification = true
+    discard await bot.send(document)
+  result = cb
+
+
 proc catHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let
@@ -325,6 +340,12 @@ proc geoHandler(bot: Telebot, latitud, longitud: float): CommandCallback =
       latitud = latitud
       longitud = longitud
 
+proc staticHandler(bot: Telebot, static_file: string): CommandCallback =
+  handlerizerDocument():
+    let
+      document_file_path = static_file
+      document_caption   = static_file
+
 
 when defined(linux):
   proc dfHandler(bot: Telebot): CommandCallback =
@@ -375,6 +396,9 @@ proc main*() {.async.} =
 
   addHandler(newConsoleLogger(fmtStr="$time $levelname "))
 
+  createDir(bash_plugins_folder)
+  createDir(static_plugins_folder)
+
   let bot = newTeleBot(api_key)
 
   bot.onUpdate(handleUpdate(bot))
@@ -415,26 +439,13 @@ proc main*() {.async.} =
 
     if cam_enabled: bot.onCommand("cam", camHandler(bot))
 
-    if cmd_bash0.name != "" and cmd_bash0.command != "":
-      bot.onCommand($cmd_bash0.name, cmd_bashHandler(bot, cmd_bash0.command))
-    if cmd_bash1.name != "" and cmd_bash1.command != "":
-      bot.onCommand($cmd_bash1.name, cmd_bashHandler(bot, cmd_bash1.command))
-    if cmd_bash2.name != "" and cmd_bash2.command != "":
-      bot.onCommand($cmd_bash2.name, cmd_bashHandler(bot, cmd_bash2.command))
-    if cmd_bash3.name != "" and cmd_bash3.command != "":
-      bot.onCommand($cmd_bash3.name, cmd_bashHandler(bot, cmd_bash3.command))
-    if cmd_bash4.name != "" and cmd_bash4.command != "":
-      bot.onCommand($cmd_bash4.name, cmd_bashHandler(bot, cmd_bash4.command))
-    if cmd_bash5.name != "" and cmd_bash5.command != "":
-      bot.onCommand($cmd_bash5.name, cmd_bashHandler(bot, cmd_bash5.command))
-    if cmd_bash6.name != "" and cmd_bash6.command != "":
-      bot.onCommand($cmd_bash6.name, cmd_bashHandler(bot, cmd_bash6.command))
-    if cmd_bash7.name != "" and cmd_bash7.command != "":
-      bot.onCommand($cmd_bash7.name, cmd_bashHandler(bot, cmd_bash7.command))
-    if cmd_bash8.name != "" and cmd_bash8.command != "":
-      bot.onCommand($cmd_bash8.name, cmd_bashHandler(bot, cmd_bash8.command))
-    if cmd_bash9.name != "" and cmd_bash9.command != "":
-      bot.onCommand($cmd_bash9.name, cmd_bashHandler(bot, cmd_bash9.command))
+    for static_file in walkFiles(static_plugins_folder / "/*.*"):
+      let (dir, name, ext) = splitFile(static_file)
+      bot.onCommand(name.toLowerAscii, staticHandler(bot, static_file))
+
+    for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
+      let (dir, name, ext) = splitFile(bash_file)
+      bot.onCommand(name.toLowerAscii, cmd_bashHandler(bot, bash_file))
 
     discard nice(19.cint)  # smooth cpu priority
 
