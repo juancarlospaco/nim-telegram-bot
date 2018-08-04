@@ -61,33 +61,6 @@ lspci     = true
 public_ip = true  # Allow any user to see the current Servers Public IP.
 
 
-# Enable / Disable User-provided Bash Plugin Commands, max 10 plugins, empty string = Disabled.
-[bash_plugin_commands]
-bash_plugin0_name    = ""
-bash_plugin0_command = ""
-bash_plugin1_name    = ""
-bash_plugin1_command = ""
-bash_plugin2_name    = ""
-bash_plugin2_command = ""
-bash_plugin3_name    = ""
-bash_plugin3_command = ""
-bash_plugin4_name    = ""
-bash_plugin4_command = ""
-bash_plugin5_name    = ""
-bash_plugin5_command = ""
-bash_plugin6_name    = ""
-bash_plugin6_command = ""
-bash_plugin7_name    = ""
-bash_plugin7_command = ""
-bash_plugin8_name    = ""
-bash_plugin8_command = ""
-bash_plugin9_name    = ""
-bash_plugin9_command = ""
-# bash_pluginX_name    = "custom"   # Example Name.        --\___Example Plugin.
-# bash_pluginX_command = "echo 42"  # Example Bash Command --/
-
-
-
 # Share Coordinates of Geographical Points Of Interest (POI) using Latitude,Longitude floating point numbers, max 10 plugins, empty string = Disabled.
 [geo_location_sharing]
 geo_plugin0_name = ""
