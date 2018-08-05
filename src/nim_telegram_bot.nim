@@ -92,7 +92,7 @@ let
 var counter: int
 
 
-proc handleUpdate(bot: TeleBot): UpdateCallback =
+proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
   let
     url = api_url
     url_getfile = api_file
@@ -102,9 +102,8 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
     upx_cmd = upx_cmd
     sha_cmd = sha_cmd
 
-  proc cb(e: Update) {.async.} =
-    inc counter
-    var response = e.message.get
+  inc counter
+  var response = update.message.get
 #     if response.text.isSome:  # Echo text message.
 #       let
 #         text = response.text.get
@@ -113,196 +112,184 @@ proc handleUpdate(bot: TeleBot): UpdateCallback =
 #       message.replyToMessageId = response.messageId
 #       message.parseMode = "markdown"
 #       discard bot.send(message)
-    if response.document.isSome:   # files
-      let
-        document = response.document.get
-        file_name = document.file_name.get
-        mime_type = document.mime_type.get
-        file_id = document.file_id
-        file_size = document.file_size.get
-        responz = await newAsyncHttpClient().get(url_getfile & file_id)
-        responz_body = await responz.body
-        file_path = parseJson(responz_body)["result"]["file_path"].getStr()
-        responx = await newAsyncHttpClient().get(url & file_path)
-        file_content = await responx.body
-        file_linecount = file_content.splitLines.len
-        size_remaining = file_size_limit - file_size
-        lineno_remaining = file_lineno_limit - file_linecount
-        file_tuple = (file_name: file_name, mime_type: mime_type, file_id: file_id,
-        file_path: file_path, file_size: file_size, file_linecount: file_linecount,
-        owner: fmt"{response.chat.first_name.get} {response.chat.last_name.get}",
-        file_content: file_content)
-        metadata_text = fmt"""⏳ *Processing file; Please wait!.* ⏳
-        *file_name:* `{file_name}`
-        *mime_type:* `{mime_type}`
-        *file_id:*   `{file_id}`
-        *file_path:* `{file_path}`
-        *file_size:* `{file_size}` Bytes _({size_remaining} below limit)_
-        *file_linecount:* `{file_linecount}` _({lineno_remaining} below limit)_
-        *owner:* {response.chat.first_name.get} {response.chat.last_name.get}"""
+  if response.document.isSome:   # files
+    let
+      document = response.document.get
+      file_name = document.file_name.get
+      mime_type = document.mime_type.get
+      file_id = document.file_id
+      file_size = document.file_size.get
+      responz = await newAsyncHttpClient().get(url_getfile & file_id)
+      responz_body = await responz.body
+      file_path = parseJson(responz_body)["result"]["file_path"].getStr()
+      responx = await newAsyncHttpClient().get(url & file_path)
+      file_content = await responx.body
+      file_linecount = file_content.splitLines.len
+      size_remaining = file_size_limit - file_size
+      lineno_remaining = file_lineno_limit - file_linecount
+      file_tuple = (file_name: file_name, mime_type: mime_type, file_id: file_id,
+      file_path: file_path, file_size: file_size, file_linecount: file_linecount,
+      owner: fmt"{response.chat.first_name.get} {response.chat.last_name.get}",
+      file_content: file_content)
+      metadata_text = fmt"""⏳ *Processing file; Please wait!.* ⏳
+      *file_name:* `{file_name}`
+      *mime_type:* `{mime_type}`
+      *file_id:*   `{file_id}`
+      *file_path:* `{file_path}`
+      *file_size:* `{file_size}` Bytes _({size_remaining} below limit)_
+      *file_linecount:* `{file_linecount}` _({lineno_remaining} below limit)_
+      *owner:* {response.chat.first_name.get} {response.chat.last_name.get}"""
 
-      var message = newMessage(response.chat.id, metadata_text)
-      message.disableNotification = true
-      message.parseMode = "markdown"
-      discard bot.send(message)
+    var message = newMessage(response.chat.id, metadata_text)
+    message.disableNotification = true
+    message.parseMode = "markdown"
+    discard bot.send(message)
 
-      if size_remaining > 1 and lineno_remaining > 1:
-        if file_name.endsWith(".nim"):
-          let
-            temp_file_nim = temp_folder / file_tuple.file_name
-            temp_file_bin = temp_file_nim.replace(".nim", "")
-            temp_file_exe = temp_file_nim.replace(".nim", ".exe")
-          writeFile(temp_file_nim,  file_tuple.file_content)
-          var
-            output: string
-            exitCode: int
-          # Linux Compilation.
-          (output, exitCode) = execCmdEx(fmt"nim c -d:release --opt:size {linux_args} --out:{temp_file_bin} {temp_file_nim}")
+    if size_remaining > 1 and lineno_remaining > 1:
+      if file_name.endsWith(".nim"):
+        let
+          temp_file_nim = temp_folder / file_tuple.file_name
+          temp_file_bin = temp_file_nim.replace(".nim", "")
+          temp_file_exe = temp_file_nim.replace(".nim", ".exe")
+        writeFile(temp_file_nim,  file_tuple.file_content)
+        var
+          output: string
+          exitCode: int
+        # Linux Compilation.
+        (output, exitCode) = execCmdEx(fmt"nim c -d:release --opt:size {linux_args} --out:{temp_file_bin} {temp_file_nim}")
+        if exitCode == 0:
+          (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_bin}")
           if exitCode == 0:
-            (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_bin}")
+            (output, exitCode) = execCmdEx(fmt"{upx_cmd} {temp_file_bin}")
             if exitCode == 0:
-              (output, exitCode) = execCmdEx(fmt"{upx_cmd} {temp_file_bin}")
+              (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_bin}")
               if exitCode == 0:
-                (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_bin}")
-                if exitCode == 0:
-                  var binary_lin = newDocument(response.chat.id, "file://" & temp_file_bin)
-                  binary_lin.caption = output.strip
-                  discard await bot.send(binary_lin)
-          # Windows Compilation.
-          (output, exitCode) = execCmdEx(fmt"nim c --cpu:amd64 --os:windows -d:release --opt:size {windows_args} --out:{temp_file_exe} {temp_file_nim}")
+                var binary_lin = newDocument(response.chat.id, "file://" & temp_file_bin)
+                binary_lin.caption = output.strip
+                discard bot.send(binary_lin)
+        # Windows Compilation.
+        (output, exitCode) = execCmdEx(fmt"nim c --cpu:amd64 --os:windows -d:release --opt:size {windows_args} --out:{temp_file_exe} {temp_file_nim}")
+        if exitCode == 0:
+          (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_exe}")
           if exitCode == 0:
-            (output, exitCode) = execCmdEx(fmt"{strip_cmd} {temp_file_exe}")
+            (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_exe}")
             if exitCode == 0:
-              (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_exe}")
-              if exitCode == 0:
-                var binary_win = newDocument(response.chat.id, "file://" & temp_file_exe)
-                binary_win.caption = output.strip
-                discard await bot.send(binary_win)
-        else:
-          echo "TODO: Plugins should take it from here, WIP."
+              var binary_win = newDocument(response.chat.id, "file://" & temp_file_exe)
+              binary_win.caption = output.strip
+              discard bot.send(binary_win)
       else:
-        var mssg = newMessage(response.chat.id, "💩 *File is too big for Plugins to Process!* 💩")
-        mssg.disableNotification = true
-        mssg.parseMode = "markdown"
-        discard bot.send(mssg)
-
-  result = cb
+        echo "TODO: Plugins should take it from here, WIP."
+    else:
+      var mssg = newMessage(response.chat.id, "💩 *File is too big for Plugins to Process!* 💩")
+      mssg.disableNotification = true
+      mssg.parseMode = "markdown"
+      discard bot.send(mssg)
 
 
 template handlerizer(body: untyped): untyped =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    body
-    var msg = newMessage(e.message.chat.id, $message.strip())
-    msg.disableNotification = true
-    # message.replyToMessageId = e.message.messageId
-    msg.parseMode = "markdown"
-    discard bot.send(msg)
-  result = cb
+  inc counter
+  body
+  var msg = newMessage(update.message.chat.id, $message.strip())
+  msg.disableNotification = true
+  msg.parseMode = "markdown"
+  discard bot.send(msg)
 
 template handlerizerPhoto(body: untyped): untyped =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    body
-    var msg = newPhoto(e.message.chat.id, photo_path)
-    msg.caption = photo_caption
-    msg.disableNotification = true
-    # message.replyToMessageId = e.message.messageId
-    discard await bot.send(msg)
-  result = cb
+  inc counter
+  body
+  var msg = newPhoto(update.message.chat.id, photo_path)
+  msg.caption = photo_caption
+  msg.disableNotification = true
+  discard bot.send(msg)
 
 template handlerizerLocation(body: untyped): untyped =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    body
-    let
-      geo_uri = "*GEO URI:* geo:$1,$2    ".format(latitud, longitud)
-      osm_url = "*OSM URL:* https://www.openstreetmap.org/?mlat=$1&mlon=$2".format(latitud, longitud)
-    var
-      msg = newMessage(e.message.chat.id,  geo_uri & osm_url)
-      geo_msg = newLocation(e.message.chat.id, longitud, latitud)
-    msg.disableNotification = true
-    geo_msg.disableNotification = true
-    msg.parseMode = "markdown"
-    discard bot.send(geo_msg)
-    discard bot.send(msg)
-  result = cb
+  inc counter
+  body
+  let
+    geo_uri = "*GEO URI:* geo:$1,$2    ".format(latitud, longitud)
+    osm_url = "*OSM URL:* https://www.openstreetmap.org/?mlat=$1&mlon=$2".format(latitud, longitud)
+  var
+    msg = newMessage(update.message.chat.id,  geo_uri & osm_url)
+    geo_msg = newLocation(update.message.chat.id, longitud, latitud)
+  msg.disableNotification = true
+  geo_msg.disableNotification = true
+  msg.parseMode = "markdown"
+  discard bot.send(geo_msg)
+  discard bot.send(msg)
 
 template handlerizerDocument(body: untyped): untyped =
-  proc cb(e: Command) {.async.} =
-    inc counter
-    body
-    var document = newDocument(e.message.chat.id, "file://" & document_file_path)
-    document.caption = document_caption.strip
-    document.disableNotification = true
-    discard await bot.send(document)
-  result = cb
+  inc counter
+  body
+  var document = newDocument(update.message.chat.id, "file://" & document_file_path)
+  document.caption = document_caption.strip
+  document.disableNotification = true
+  discard bot.send(document)
 
 
-proc catHandler(bot: Telebot): CommandCallback =
+proc catHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc dogHandler(bot: Telebot): CommandCallback =
+proc dogHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc bigcatHandler(bot: Telebot): CommandCallback =
+proc bigcatHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(bigcat_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc seaHandler(bot: Telebot): CommandCallback =
+proc seaHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(sea_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc public_ipHandler(bot: Telebot): CommandCallback =
+proc public_ipHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let
       responz = await newAsyncHttpClient().get(pub_ip_api)  # await response
       publ_ip = await responz.body                          # await body
       message = fmt"*Server Public IP Address:* `{publ_ip}`"
 
-proc uptimeHandler(bot: Telebot): CommandCallback =
+proc uptimeHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = fmt"*Uptime:* `{cpuTime() - start_time}` ⏰"
 
-proc pingHandler(bot: Telebot): CommandCallback =
+proc pingHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = "*pong*"
 
-proc datetimeHandler(bot: Telebot): CommandCallback =
+proc datetimeHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = $now()
 
-proc aboutHandler(bot: Telebot): CommandCallback =
+proc aboutHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = about_texts & $counter
 
-proc helpHandler(bot: Telebot): CommandCallback =
+proc helpHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = helps_texts
 
-proc cocHandler(bot: Telebot): CommandCallback =
+proc cocHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = coc_text
 
-proc donateHandler(bot: Telebot): CommandCallback =
+proc donateHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = donate_text
 
-proc motdHandler(bot: Telebot): CommandCallback =
+proc motdHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = motd_text
 
-proc dollarHandler(bot: Telebot): CommandCallback =
+proc dollarHandler(bot: Telebot, update: Command) {.async.} =
   let
     money_json = waitFor oer_client.latest()      # Updated Prices.
     names_json = waitFor oer_client.currencies()  # Friendly Names.
@@ -313,13 +300,13 @@ proc dollarHandler(bot: Telebot): CommandCallback =
   handlerizer():
     let message = dineros
 
-proc geoHandler(bot: Telebot, latitud, longitud: float): CommandCallback =
+proc geoHandler(bot: Telebot, latitud, longitud: float, update: Command) {.async.} =
   handlerizerLocation():
     let
       latitud = latitud
       longitud = longitud
 
-proc staticHandler(bot: Telebot, static_file: string): CommandCallback =
+proc staticHandler(bot: Telebot, update: Command, static_file: string) {.async.} =
   handlerizerDocument():
     let
       document_file_path = static_file
@@ -327,31 +314,31 @@ proc staticHandler(bot: Telebot, static_file: string): CommandCallback =
 
 
 when defined(linux):
-  proc dfHandler(bot: Telebot): CommandCallback =
+  proc dfHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("df --human-readable --local --total --print-type")[0]}`"""
 
-  proc freeHandler(bot: Telebot): CommandCallback =
+  proc freeHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("free --human --total --giga")[0]}`"""
 
-  proc ipHandler(bot: Telebot): CommandCallback =
+  proc ipHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("ip -brief address")[0]}`"""
 
-  proc lshwHandler(bot: Telebot): CommandCallback =
+  proc lshwHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("lshw -short")[0]}`"""
 
-  proc lsusbHandler(bot: Telebot): CommandCallback =
+  proc lsusbHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("lsusb")[0]}`"""
 
-  proc lspciHandler(bot: Telebot): CommandCallback =
+  proc lspciHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
-  proc camHandler(bot: Telebot): CommandCallback =
+  proc camHandler(bot: Telebot, update: Command) {.async.} =
     discard execCmdEx(if cam_blur: cam_ffmepg_blur else: cam_ffmepg)
     let
       path = "file://" & ffmpeg_outp
@@ -361,7 +348,7 @@ when defined(linux):
         photo_path = path
         photo_caption = caption
 
-  proc cmd_bashHandler(bot: Telebot, command: string): CommandCallback =
+  proc cmd_bashHandler(bot: Telebot, command: string, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx(command)[0]}`"""
 
@@ -381,25 +368,25 @@ proc main*() {.async.} =
 
   let bot = newTeleBot(api_key)
 
-  bot.onUpdate(handleUpdate(bot))
+  bot.onUpdate(handleUpdate)
 
-  if cmd_cat:      bot.onCommand("cat", catHandler(bot))
-  if cmd_dog:      bot.onCommand("dog", dogHandler(bot))
-  if cmd_bigcat:   bot.onCommand("bigcat", bigcatHandler(bot))
-  if cmd_sea:      bot.onCommand("sea", seaHandler(bot))
-  if cmd_coc:      bot.onCommand("coc", cocHandler(bot))
-  if cmd_motd:     bot.onCommand("motd", motdHandler(bot))
-  if cmd_help:     bot.onCommand("help", helpHandler(bot))
-  if cmd_ping:     bot.onCommand("ping", pingHandler(bot))
-  if cmd_about:    bot.onCommand("about", aboutHandler(bot))
-  if cmd_uptime:   bot.onCommand("uptime", uptimeHandler(bot))
-  if cmd_donate:   bot.onCommand("donate", donateHandler(bot))
-  if cmd_datetime: bot.onCommand("datetime", datetimeHandler(bot))
-  if cmd_dollar:   bot.onCommand("dollar", dollarHandler(bot))
+  if cmd_cat:      bot.onCommand("cat", catHandler)
+  if cmd_dog:      bot.onCommand("dog", dogHandler)
+  if cmd_bigcat:   bot.onCommand("bigcat", bigcatHandler)
+  if cmd_sea:      bot.onCommand("sea", seaHandler)
+  if cmd_coc:      bot.onCommand("coc", cocHandler)
+  if cmd_motd:     bot.onCommand("motd", motdHandler)
+  if cmd_help:     bot.onCommand("help", helpHandler)
+  if cmd_ping:     bot.onCommand("ping", pingHandler)
+  if cmd_about:    bot.onCommand("about", aboutHandler)
+  if cmd_uptime:   bot.onCommand("uptime", uptimeHandler)
+  if cmd_donate:   bot.onCommand("donate", donateHandler)
+  if cmd_datetime: bot.onCommand("datetime", datetimeHandler)
+  if cmd_dollar:   bot.onCommand("dollar", dollarHandler)
 
   for static_file in walkFiles(static_plugins_folder / "/*.*"):
     let (dir, name, ext) = splitFile(static_file)
-    bot.onCommand(name.toLowerAscii, staticHandler(bot, static_file))
+#     bot.onCommand(name.toLowerAscii, staticHandler(static_file))  # FIXME
 
   for geo_file in walkFiles(geo_plugins_folder / "/*.ini"):
     let
@@ -407,22 +394,22 @@ proc main*() {.async.} =
       latitud = parseFloat(geo_ini.getSectionValue("", "latitude"))
       longitu = parseFloat(geo_ini.getSectionValue("", "longitude"))
       (dir, name, ext) = splitFile(geo_file)
-    bot.onCommand(name.toLowerAscii, geoHandler(bot, latitud, longitu))
+#     bot.onCommand(name.toLowerAscii, geoHandler(latitud, longitu))  # FIXME
 
   when defined(linux):
-    if server_cmd_ip:        bot.onCommand("ip", ipHandler(bot))
-    if server_cmd_df:        bot.onCommand("df", dfHandler(bot))
-    if server_cmd_free:      bot.onCommand("free", freeHandler(bot))
-    if server_cmd_lshw:      bot.onCommand("lshw", lshwHandler(bot))
-    if server_cmd_lsusb:     bot.onCommand("lsusb", lsusbHandler(bot))
-    if server_cmd_lspci:     bot.onCommand("lspci", lspciHandler(bot))
-    if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler(bot))
+    if server_cmd_ip:        bot.onCommand("ip", ipHandler)
+    if server_cmd_df:        bot.onCommand("df", dfHandler)
+    if server_cmd_free:      bot.onCommand("free", freeHandler)
+    if server_cmd_lshw:      bot.onCommand("lshw", lshwHandler)
+    if server_cmd_lsusb:     bot.onCommand("lsusb", lsusbHandler)
+    if server_cmd_lspci:     bot.onCommand("lspci", lspciHandler)
+    if server_cmd_public_ip: bot.onCommand("public_ip", public_ipHandler)
 
-    if cam_enabled: bot.onCommand("cam", camHandler(bot))
+    if cam_enabled: bot.onCommand("cam", camHandler)
 
     for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
       let (dir, name, ext) = splitFile(bash_file)
-      bot.onCommand(name.toLowerAscii, cmd_bashHandler(bot, bash_file))
+#       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))  # FIXME
 
     discard nice(19.cint)  # smooth cpu priority
 
