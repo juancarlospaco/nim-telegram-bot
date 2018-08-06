@@ -2,10 +2,11 @@
 
 version       = "0.1.0"
 author        = "Juan Carlos"
-description   = "Telegram Bot for Nim"
+description   = "Generic Configurable Telegram Bot for Nim, with builtin basic functionality and Plugins"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["nim_telegram_bot"]
+skipDirs      = @["art"]
+# bin           = @["nim_telegram_bot"]
 
 # Dependencies
 

@@ -5,3 +5,5 @@ src/nim_telegram_bot
 config.ini
 downloads/
 build/
+src/*.md
+
