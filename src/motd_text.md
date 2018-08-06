@@ -1,1 +1,0 @@
-*Message Of The Day.*
