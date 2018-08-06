@@ -5,9 +5,14 @@
 ![Rlyeh HackLab](https://raw.githubusercontent.com/juancarlospaco/nim-telegram-bot/master/art/nim-telegram-bot-rlye.jpg "Art by Rlyeh HackLab http://rlab.be")
 
 
+## Install
+
+- `nimble install nim_telegram_bot`
+
+
 ## Compile
 
-Get the Code:
+To compile from sources, get the Code:
 
 ```bash
 git clone https://github.com/juancarlospaco/nim-telegram-bot.git
