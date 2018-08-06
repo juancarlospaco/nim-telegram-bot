@@ -77,7 +77,9 @@ the filename must be all lowercase and not contain whitespaces and end with `*.p
 the filename will be the command to trigger the plugin, eg `lol.py` will be `/lol` on Telegram chat,
 the return of the `main()` function of the script will be sent as string to chat by the bot,
 anything you want the bot to say just return it on `main()` as `str` type,
-example `./plugins/python/foo.py` will be `/foo` on Telegram chat and will call `foo.main()`.
+the `main()` function name is a convention, is hardcoded and can not be changed.
+
+Example `./plugins/python/foo.py` will be `/foo` on Telegram chat and will call `foo.main()`.
 
 Example Python plugin:
 
