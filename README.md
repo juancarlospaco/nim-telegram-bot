@@ -91,6 +91,15 @@ anything you want the bot to share just copy it to that folder.
 Example Static Files plugin: Any file is Ok.
 
 
+# CrossCompilation On Demand
+
+The bot will reply any valid `*.nim` plain text source code file with
+CrossCompiled stripped native binaries executables for Linux and Windows,
+including the SHA1 CheckSums on the chat (it compiles, does not run),
+theres limits on total file size and total line count,
+it can be disabled and configured from the `config.ini`.
+
+
 ## Run
 
 ```bash
