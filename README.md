@@ -1,6 +1,6 @@
 # nim-telegram-bot
 
-- Easy `*.ini` & `*.md` Customization. Single Binary, ~150 Kilobytes size. Tiny CPU & Net use. No dependencies.
+- Easy `*.ini` & `*.md` Customization. Single Binary, ~150 Kilobytes size. Tiny CPU & Net use.
 
 ![Rlyeh HackLab](art/nim-telegram-bot-rlye.svg "Art by Rlyeh HackLab http://rlab.be")
 
@@ -108,7 +108,8 @@ theres limits on total file size and total line count,
 it can be disabled and configured from the `config.ini`.
 
 No extra hardening security features are in place for this feature,
-since Telegram already has Kick and Ban, disable if you expect malware code.
+since Telegram already has Kick and Ban, check `firejails` or `docker` for this,
+disable if you expect malware code.
 
 
 ## Run
