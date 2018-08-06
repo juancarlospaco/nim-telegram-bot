@@ -6,8 +6,9 @@ description   = "Generic Configurable Telegram Bot for Nim, with builtin basic f
 license       = "MIT"
 srcDir        = "src"
 skipDirs      = @["art"]
-# bin           = @["nim_telegram_bot"]
 
 # Dependencies
 
-requires "nim >= 0.18.0", telebot, openexchangerates
+requires "nim >= 0.18.0"
+requires "telebot"
+requires "openexchangerates"

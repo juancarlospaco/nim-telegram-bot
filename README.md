@@ -91,6 +91,14 @@ anything you want the bot to share just copy it to that folder.
 Example Static Files plugin: Any file is Ok.
 
 
+**Nim-based Plugins:**
+
+Maybe in the future we implement it, but right now it has few builtin functionalities
+that if you want to create a new functionality using Nim just send the Pull Request,
+to be integrated into the Core directly instead of as a Plugin,
+all functionalities can be Enabled / Disabled from the `config.ini` anyways.
+
+
 # CrossCompilation On Demand
 
 The bot will reply any valid `*.nim` plain text source code file with
