@@ -9,6 +9,4 @@ bin           = @["nim_telegram_bot"]
 
 # Dependencies
 
-requires "nim >= 0.18.0"
-requires "telebot"
-requires "openexchangerates"
+requires "nim >= 0.18.0", "telebot", "openexchangerates"
