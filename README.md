@@ -55,7 +55,7 @@ On run the bot creates the following folders:
 the filename must be all lowercase and not contain whitespaces and end with `*.sh`,
 the filename will be the command to trigger the plugin, eg `foo.sh` will be `/foo` on Telegram chat,
 output of the script will be sent as string to chat by the bot,
-anything you want the bot to say just print it to standard output, Markdown is supported.
+anything you want the bot to say just print it to standard output.
 
 Example Bash plugin:
 
@@ -69,7 +69,7 @@ echo 42
 the filename must be all lowercase and not contain whitespaces and end with `*.ini`,
 the filename will be the command to trigger the plugin, eg `bar.ini` will be `/bar` on Telegram chat,
 Geo Location of the INI will be sent as Map Thumbnail and Open Street Map Link to chat by the bot,
-anything you want the bot to Geo Locaet just add latitude and longitude to the INI, Markdown is supported.
+anything you want the bot to Geo Locate just add latitude and longitude to the INI.
 
 Example Geo Location Sharing plugin:
 
@@ -84,7 +84,7 @@ longitude = 42.66
 the filename must be all lowercase and not contain whitespaces,
 the filename will be the command to trigger the plugin, eg `baz.jpg` will be `/baz` on Telegram chat,
 the file will be sent as attached Document file to chat by the bot,
-anything you want the bot to share just copy it to that folder, Markdown is supported.
+anything you want the bot to share just copy it to that folder.
 
 Example Static Files plugin: Any file is Ok.
 
