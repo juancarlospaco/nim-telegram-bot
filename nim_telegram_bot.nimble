@@ -6,6 +6,4 @@ srcDir      = "src"
 bin         = @["nim_telegram_bot.nim"]
 skipDirs    = @["art"]
 
-requires "nim >= 0.18.0"
-requires "telebot"
-requires "openexchangerates"
+requires "nim >= 0.18.0", "telebot", "openexchangerates"
