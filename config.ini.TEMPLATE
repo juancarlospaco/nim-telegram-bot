@@ -2,6 +2,10 @@
 api_key = ""
 # Telegram API Long-Pooling Interval, 1~127 is Valid (int8), gets multiplied by 1000. 1=responsive, more net use, more requests/minute. 127=slow,tiny net use,less requests/minute.
 polling_interval = 1
+# Enable / Disable Terminal Colors (Color Blind support).
+terminal_colors = true
+# Enable / Disable Python3 Plugins.
+python_plugins = true
 
 
 [openexchangerates]
