@@ -2,7 +2,7 @@
 
 - Easy `*.ini` & `*.md` Customization. Single Binary, ~150 Kilobytes size. Tiny CPU & Net use. Plugins.
 
-![Rlyeh HackLab](https://raw.githubusercontent.com/juancarlospaco/nim-telegram-bot/0.2.3/art/nim-telegram-bot-rlye.svg "Art by Rlyeh HackLab http://rlab.be")
+![Rlyeh HackLab](https://raw.githubusercontent.com/juancarlospaco/nim-telegram-bot/master/art/nim-telegram-bot-rlye.svg "Art by Rlyeh HackLab http://rlab.be")
 
 
 ## Compile
