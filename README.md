@@ -38,6 +38,56 @@ nim c -r -d:ssl nim_telegram_bot.nim
 
 You can hack any of the `*.ini` and `*.md` to customize.
 
+## Plugins
+
+On run the bot creates the following folders:
+
+```
+./plugins/
+./plugins/bash/
+./plugins/geo/
+./plugins/static/
+```
+
+**Bash scripts plugins:**
+
+`./plugins/bash/` are for `*.sh` Bash scripts plugins,
+the filename must be all lowercase and not contain whitespaces and end with `*.sh`,
+the filename will be the command to trigger the plugin, eg `foo.sh` will be `/foo` on Telegram chat,
+output of the script will be sent as string to chat by the bot,
+anything you want the bot to say just print it to standard output, Markdown is supported.
+
+Example Bash plugin:
+
+```bash
+echo 42
+```
+
+**Geo Location Sharing plugins:**
+
+`./plugins/geo/` are for `*.ini` Geo Location Sharing plugins,
+the filename must be all lowercase and not contain whitespaces and end with `*.ini`,
+the filename will be the command to trigger the plugin, eg `bar.ini` will be `/bar` on Telegram chat,
+Geo Location of the INI will be sent as Map Thumbnail and Open Street Map Link to chat by the bot,
+anything you want the bot to Geo Locaet just add latitude and longitude to the INI, Markdown is supported.
+
+Example Geo Location Sharing plugin:
+
+```ini
+latitude = 55.42
+longitude = 42.66
+```
+
+**Static Files plugins:**
+
+`./plugins/static/` are for `*.*` Static Files "plugins",
+the filename must be all lowercase and not contain whitespaces,
+the filename will be the command to trigger the plugin, eg `baz.jpg` will be `/baz` on Telegram chat,
+the file will be sent as attached Document file to chat by the bot,
+anything you want the bot to share just copy it to that folder, Markdown is supported.
+
+Example Static Files plugin: Any file is Ok.
+
 
 ## Run
 
