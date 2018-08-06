@@ -60,7 +60,8 @@ anything you want the bot to say just print it to standard output.
 Example Bash plugin:
 
 ```bash
-echo 42
+# example.sh
+echo "This is an example Bash plugin."
 ```
 
 **Geo Location Sharing plugins:**
@@ -74,6 +75,7 @@ anything you want the bot to Geo Locate just add latitude and longitude to the I
 Example Geo Location Sharing plugin:
 
 ```ini
+# example.ini
 latitude = 55.42
 longitude = 42.66
 ```
