@@ -50,6 +50,7 @@ On run the bot creates the following folders:
 ```
 ./plugins/
 ./plugins/bash/
+./plugins/python/
 ./plugins/geo/
 ./plugins/static/
 ```
@@ -67,6 +68,23 @@ Example Bash plugin:
 ```bash
 # example.sh
 echo "This is an example Bash plugin."
+```
+
+**Python plugins:**
+
+`./plugins/python/` are for `*.py` Python 3 plugins,
+the filename must be all lowercase and not contain whitespaces and end with `*.py`,
+the filename will be the command to trigger the plugin, eg `lol.py` will be `/lol` on Telegram chat,
+the return of the `main()` function of the script will be sent as string to chat by the bot,
+anything you want the bot to say just return it on `main()` as `str` type,
+example `./plugins/python/foo.py` will be `/foo` on Telegram chat and will call `foo.main()`.
+
+Example Python plugin:
+
+```python
+# example.py
+def main():
+    return "Example Python Plugin."
 ```
 
 **Geo Location Sharing plugins:**
