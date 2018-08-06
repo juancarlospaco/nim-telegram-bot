@@ -4,6 +4,7 @@ description = "Generic Configurable Async Telegram Bot for Nim with builtin basi
 license     = "MIT"
 srcDir      = "src"
 skipDirs    = @["art"]
+bin         = @["nim_telegram_bot"]
 
 
 # Dependencies
