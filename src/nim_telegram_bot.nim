@@ -300,17 +300,21 @@ proc dollarHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = dineros
 
-proc geoHandler(bot: Telebot, latitud, longitud: float, update: Command) {.async.} =
-  handlerizerLocation():
-    let
-      latitud = latitud
-      longitud = longitud
+proc geoHandler(latitud, longitud: float,): CommandCallback =
+  proc cb(bot: Telebot, update: Command) {.async.} =
+    handlerizerLocation():
+      let
+        latitud = latitud
+        longitud = longitud
+  return cb
 
-proc staticHandler(bot: Telebot, update: Command, static_file: string) {.async.} =
-  handlerizerDocument():
-    let
-      document_file_path = static_file
-      document_caption   = static_file
+proc staticHandler(static_file: string): CommandCallback =
+  proc cb(bot: Telebot, update: Command) {.async.} =
+    handlerizerDocument():
+      let
+        document_file_path = static_file
+        document_caption   = static_file
+  return cb
 
 
 when defined(linux):
@@ -348,9 +352,11 @@ when defined(linux):
         photo_path = path
         photo_caption = caption
 
-  proc cmd_bashHandler(bot: Telebot, command: string, update: Command) {.async.} =
-    handlerizer():
-      let message = fmt"""`{execCmdEx(command)[0]}`"""
+  proc cmd_bashHandler(command: string,): CommandCallback =
+    proc cb(bot: Telebot, update: Command) {.async.} =
+      handlerizer():
+        let message = fmt"""`{execCmdEx(command)[0]}`"""
+    return cb
 
 
 proc main*() {.async.} =
@@ -386,7 +392,7 @@ proc main*() {.async.} =
 
   for static_file in walkFiles(static_plugins_folder / "/*.*"):
     let (dir, name, ext) = splitFile(static_file)
-#     bot.onCommand(name.toLowerAscii, staticHandler(static_file))  # FIXME
+    bot.onCommand(name.toLowerAscii, staticHandler(static_file))
 
   for geo_file in walkFiles(geo_plugins_folder / "/*.ini"):
     let
@@ -394,7 +400,7 @@ proc main*() {.async.} =
       latitud = parseFloat(geo_ini.getSectionValue("", "latitude"))
       longitu = parseFloat(geo_ini.getSectionValue("", "longitude"))
       (dir, name, ext) = splitFile(geo_file)
-#     bot.onCommand(name.toLowerAscii, geoHandler(latitud, longitu))  # FIXME
+    bot.onCommand(name.toLowerAscii, geoHandler(latitud, longitu))
 
   when defined(linux):
     if server_cmd_ip:        bot.onCommand("ip", ipHandler)
@@ -409,7 +415,7 @@ proc main*() {.async.} =
 
     for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
       let (dir, name, ext) = splitFile(bash_file)
-#       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))  # FIXME
+      bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))
 
     discard nice(19.cint)  # smooth cpu priority
 
