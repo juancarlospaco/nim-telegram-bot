@@ -3,6 +3,7 @@ import
   strformat, strutils, terminal, times, random, posix, os
 import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
 import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
+import nimpy              # nimble install nimpy              https://github.com/yglukhov/nimpy
 # import nimprof
 
 
@@ -43,6 +44,7 @@ let
   start_time = cpuTime()
   plugins_folder = getCurrentDir() / "plugins"
   bash_plugins_folder = plugins_folder / "bash"
+  python_plugins_folder = plugins_folder / "python"
   static_plugins_folder = plugins_folder / "static"
   geo_plugins_folder = plugins_folder / "geo"
   config_ini = loadConfig("config.ini")
@@ -83,6 +85,7 @@ let
   cam_enabled = parseBool(config_ini.getSectionValue("linux_server_camera", "cam"))
   cam_blur    = parseBool(config_ini.getSectionValue("linux_server_camera", "blur"))
   cam_caption = config_ini.getSectionValue("linux_server_camera", "photo_caption")
+  python_plugins = parseBool(config_ini.getSectionValue("", "python_plugins"))
   api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
   api_file = fmt"https://api.telegram.org/bot{api_key}/getFile?file_id="
   polling_interval = int32(parseInt(config_ini.getSectionValue("", "polling_interval")).int8 * 1000)
@@ -316,6 +319,13 @@ proc staticHandler(static_file: string): CommandCallback =
         document_caption   = static_file
   return cb
 
+proc pythonHandler(name: string): CommandCallback =
+  proc cb(bot: Telebot, update: Command) {.async.} =
+    let python_output = pyImport(name).main().to(string)
+    handlerizer():
+      let message = python_output
+  return cb
+
 
 when defined(linux):
   proc dfHandler(bot: Telebot, update: Command) {.async.} =
@@ -369,6 +379,7 @@ proc main*() {.async.} =
   addHandler(newConsoleLogger(fmtStr="$time $levelname "))
 
   createDir(bash_plugins_folder)
+  createDir(python_plugins_folder)
   createDir(static_plugins_folder)
   createDir(geo_plugins_folder)
 
@@ -416,6 +427,12 @@ proc main*() {.async.} =
     for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
       let (dir, name, ext) = splitFile(bash_file)
       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))
+
+    if python_plugins:
+      discard pyImport("sys").path.append(python_plugins_folder)
+      for python_file in walkFiles(python_plugins_folder / "/*.py"):
+        let (dir, name, ext) = splitFile(python_file)
+        bot.onCommand(name.toLowerAscii, pythonHandler(name))
 
     discard nice(19.cint)  # smooth cpu priority
 
