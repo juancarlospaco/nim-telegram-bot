@@ -98,7 +98,9 @@ CrossCompiled stripped native binary executables for Linux and Windows,
 including the SHA1 CheckSums on the chat (it compiles, does not run),
 theres limits on total file size and total line count,
 it can be disabled and configured from the `config.ini`.
-No extra security features are in place for this feature, disable if you expect malware code.
+
+No extra hardening security features are in place for this feature,
+since Telegram already has Kick and Ban, disable if you expect malware code.
 
 
 ## Run
