@@ -1,4 +1,4 @@
-version     = "0.2.3"
+version     = "0.2.5"
 author      = "Juan Carlos"
 description = "Generic Configurable Async Telegram Bot for Nim with builtin basic functionality and Plugins."
 license     = "MIT"
@@ -12,3 +12,4 @@ bin         = @["nim_telegram_bot"]
 requires "nim >= 0.18.0"
 requires "openexchangerates"
 requires "telebot"
+requires "nimpy"
