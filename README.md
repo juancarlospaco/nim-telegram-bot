@@ -172,11 +172,22 @@ Example:
 - [Nim](https://nim-lang.org/install_unix.html) `>= 0.18.0`
 - [Telebot](https://github.com/ba0f3/telebot.nim) [`nimble install telebot`](https://nimble.directory/pkg/telebot)
 - [OpenExchangeRates](https://github.com/juancarlospaco/nim-openexchangerates#nim-openexchangerates) [`nimble install openexchangerates`](https://nimble.directory/pkg/openexchangerates)
+- [NimPy](https://github.com/yglukhov/nimpy) [`nimble install nimpy`](https://nimble.directory/pkg/nimpy)
 
 **Optional** For Photos on-demand:
 
 - 1 Working USB WebCam Camera on `/dev/video0`.
 - FFMPEG (Linux package, with WebP support).
+
+**Optional** For CrossCompilation on-demand:
+
+- `strip` (Linux package).
+- `upx` (Linux package).
+- `sha1sum` (Linux package).
+
+**Optional** For Python Plugins:
+
+- `python` (3.6+).
 
 
 ### Single File
