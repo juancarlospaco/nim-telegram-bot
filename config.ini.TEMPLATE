@@ -6,6 +6,8 @@ polling_interval = 1
 terminal_colors = true
 # Enable / Disable Python3 Plugins.
 python_plugins = true
+# IPs / Hostnames to ping (comma separated, empty string = disabled).
+ips2ping = "127.0.0.1,::1"
 
 
 [openexchangerates]
@@ -37,7 +39,6 @@ sea      = true
 coc      = true
 motd     = true
 help     = true
-ping     = true
 about    = true
 uptime   = true
 donate   = true

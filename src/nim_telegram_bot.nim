@@ -4,6 +4,7 @@ import
 import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
 import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 import nimpy              # nimble install nimpy              https://github.com/yglukhov/nimpy
+# import zip/zipfiles       # nimble install zip
 # import nimprof
 
 
@@ -50,6 +51,8 @@ let
   config_ini = loadConfig("config.ini")
   api_key    = config_ini.getSectionValue("", "api_key")
   cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
+  ips2ping = config_ini.getSectionValue("", "ips2ping").split(',')
+  # folders2backup = parseJson(config_ini.getSectionValue("", "folders2backup"))
 
   file_size_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "size_limit"))
   file_lineno_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "lines_limit"))
@@ -63,7 +66,6 @@ let
   cmd_coc      = parseBool(config_ini.getSectionValue("commands", "coc"))
   cmd_motd     = parseBool(config_ini.getSectionValue("commands", "motd"))
   cmd_help     = parseBool(config_ini.getSectionValue("commands", "help"))
-  cmd_ping     = parseBool(config_ini.getSectionValue("commands", "ping"))
   cmd_about    = parseBool(config_ini.getSectionValue("commands", "about"))
   cmd_uptime   = parseBool(config_ini.getSectionValue("commands", "uptime"))
   cmd_donate   = parseBool(config_ini.getSectionValue("commands", "donate"))
@@ -262,11 +264,9 @@ proc public_ipHandler(bot: Telebot, update: Command) {.async.} =
 
 proc uptimeHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
-    let message = fmt"*Uptime:* `{cpuTime() - start_time}` ⏰"
-
-proc pingHandler(bot: Telebot, update: Command) {.async.} =
-  handlerizer():
-    let message = "*pong*"
+    let message = fmt"""⏰ *Uptime:* ⏰
+    Ark Server:   `{execCmdEx("uptime --pretty")[0]}`
+    Telegram Bot: `{cpuTime() - start_time}`"""
 
 proc datetimeHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
@@ -326,6 +326,24 @@ proc pythonHandler(name: string): CommandCallback =
       let message = python_output
   return cb
 
+# proc backupHandler(folders: JsonNode): CommandCallback =
+#   proc cb(bot: Telebot, update: Command) {.async.} =
+#     for folder in folders.pairs:
+#       var z: ZipArchive
+#       discard z.open(fmt"{folder.key}-{$now()}.zip", fmWrite)
+#       for a_folder in folder.val:
+#         echo "before FILE"
+#         var foldr = $a_folder
+#         for item in walkDirRec(foldr):
+#           echo "IN FILE"
+#           echo "FILE " & $item
+#           #z.addFile($item)
+#         echo "AFTER FILE"
+#       z.close
+# #       handlerizer:
+# #         var message = fmt"*Backup:* from `{folder.val}` to `{folder.key}`."
+#   return cb
+
 
 when defined(linux):
   proc dfHandler(bot: Telebot, update: Command) {.async.} =
@@ -351,6 +369,15 @@ when defined(linux):
   proc lspciHandler(bot: Telebot, update: Command) {.async.} =
     handlerizer():
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
+
+  proc pingHandler(ips2ping: seq[string]): CommandCallback =
+    proc cb(bot: Telebot, update: Command) {.async.} =
+      var pings_msg = "📡 *Ping results:* 📡 \n"
+      for an_ip in ips2ping:
+        pings_msg &= fmt"""`{execCmdEx("ping -c 1 -t 1 -W 1 " & an_ip)[0]}`"""
+      handlerizer():
+        let message = pings_msg
+    return cb
 
   proc camHandler(bot: Telebot, update: Command) {.async.} =
     discard execCmdEx(if cam_blur: cam_ffmepg_blur else: cam_ffmepg)
@@ -394,12 +421,14 @@ proc main*() {.async.} =
   if cmd_coc:      bot.onCommand("coc", cocHandler)
   if cmd_motd:     bot.onCommand("motd", motdHandler)
   if cmd_help:     bot.onCommand("help", helpHandler)
-  if cmd_ping:     bot.onCommand("ping", pingHandler)
   if cmd_about:    bot.onCommand("about", aboutHandler)
   if cmd_uptime:   bot.onCommand("uptime", uptimeHandler)
   if cmd_donate:   bot.onCommand("donate", donateHandler)
   if cmd_datetime: bot.onCommand("datetime", datetimeHandler)
   if cmd_dollar:   bot.onCommand("dollar", dollarHandler)
+  # if folders2backup.len != 0: bot.onCommand("backup", backupHandler(folders2backup))
+
+  if ips2ping != @[""]: bot.onCommand("ping", pingHandler(ips2ping))
 
   for static_file in walkFiles(static_plugins_folder / "/*.*"):
     let (dir, name, ext) = splitFile(static_file)
