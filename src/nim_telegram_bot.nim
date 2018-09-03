@@ -36,13 +36,12 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
       message.parseMode = "markdown"
       discard bot.send(message)
       let
-        temp_file_jpg = temp_folder / "nim_telegram_bot_web_screenshot.jpeg"
+        temp_file_jpg = temp_folder / "nim_telegram_bot_web_screenshot.jpg"
         temp_file_pdf = temp_folder / "nim_telegram_bot_web_screenshot.pdf"
       var
         output: string
         exitCode: int
       (output, exitCode) = execCmdEx(cutycapt_cmd & "--out=" & temp_file_jpg & " --url=" & texto)
-      echo (output, exitCode)
       if exitCode == 0:
         var foti = newPhoto(response.chat.id,  "file://" & temp_file_jpg)
         foti.caption = texto
@@ -354,13 +353,13 @@ when defined(linux):
         let message = fmt"""`{execCmdEx(command)[0]}`"""
     return cb
 
-#   proc pythonHandler*(name: string): CommandCallback =
-#     ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
-#     proc cb(bot: Telebot, update: Command) {.async.} =
-#       let python_output = pyImport(name).main().to(string)
-#       handlerizer():
-#         let message = python_output
-#     return cb
+  proc pythonHandler*(name: string): CommandCallback =
+    ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
+    proc cb(bot: Telebot, update: Command) {.async.} =
+      let python_output = pyImport(name).main().to(string)
+      handlerizer():
+        let message = python_output
+    return cb
 
 
 proc main*() {.async.} =
@@ -427,12 +426,12 @@ proc main*() {.async.} =
       let (dir, name, ext) = splitFile(bash_file)
       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))
 
-#     if python_plugins:
-#       discard pyImport("sys").path.append(python_plugins_folder)
-#       for python_file in walkFiles(python_plugins_folder / "/*.py"):
-#         echo "Loading Python Plugin: " & python_file
-#         let (dir, name, ext) = splitFile(python_file)
-#         bot.onCommand(name.toLowerAscii, pythonHandler(name))
+    if python_plugins:
+      discard pyImport("sys").path.append(python_plugins_folder)
+      for python_file in walkFiles(python_plugins_folder / "/*.py"):
+        echo "Loading Python Plugin: " & python_file
+        let (dir, name, ext) = splitFile(python_file)
+        bot.onCommand(name.toLowerAscii, pythonHandler(name))
 
     discard nice(19.cint)  # smooth cpu priority
 
