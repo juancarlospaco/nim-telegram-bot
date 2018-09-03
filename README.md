@@ -212,6 +212,11 @@ Example to run:
 
 - `python` (3.7+, older Python versions maybe works but its not supported).
 
+**Optional** For Web Screenshots on-demand:
+
+- `CutyCapt` http://cutycapt.sourceforge.net
+- `XVFB` for HeadLess Servers without X only, if you have X running is not required.
+
 
 ### Single File
 
