@@ -105,7 +105,7 @@ proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
       discard bot.send(mssg)
 
 
-template handlerizer(body: untyped): untyped =
+template handlerizer*(body: untyped): untyped =
   ## This Template sends a markdown text message from the ``message`` variable.
   inc counter
   body
@@ -114,7 +114,7 @@ template handlerizer(body: untyped): untyped =
   msg.parseMode = "markdown"
   discard bot.send(msg)
 
-template handlerizerPhoto(body: untyped): untyped =
+template handlerizerPhoto*(body: untyped): untyped =
   ## This Template sends a photo image message from the ``photo_path`` variable with the caption comment from ``photo_caption``.
   inc counter
   body
@@ -123,7 +123,7 @@ template handlerizerPhoto(body: untyped): untyped =
   msg.disableNotification = true
   discard bot.send(msg)
 
-template handlerizerLocation(body: untyped): untyped =
+template handlerizerLocation*(body: untyped): untyped =
   ## This Template sends a Geo Location message from the ``latitud`` and ``longitud`` variables.
   inc counter
   body
@@ -139,7 +139,7 @@ template handlerizerLocation(body: untyped): untyped =
   discard bot.send(geo_msg)
   discard bot.send(msg)
 
-template handlerizerDocument(body: untyped): untyped =
+template handlerizerDocument*(body: untyped): untyped =
   ## This Template sends an attached File Document message from the ``document_file_path`` variable with the caption comment from ``document_caption``.
   inc counter
   body
@@ -315,7 +315,7 @@ when defined(linux):
 
 
 proc main*() {.async.} =
-  ## Main loop of the bot.
+  ## Main loop of the bot. It instances, init, config, run loop of the Bot.
   if cli_colors:
     randomize()
     setBackgroundColor(bgBlack)
