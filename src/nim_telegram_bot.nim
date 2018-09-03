@@ -7,95 +7,9 @@ import nimpy              # nimble install nimpy              https://github.com
 # import zip/zipfiles       # nimble install zip
 # import nimprof
 
-
-const
-  about_texts = fmt"""*Nim Telegram Bot* 🤖
-  ☑️ *Version:*     `0.0.1` 👾
-  ☑️ *Licence:*     MIT 👽
-  ☑️ *Author:*      _Juan Carlos_ @juancarlospaco 😼
-  ☑️ *Compiled:*    `{CompileDate} {CompileTime}` ⏰
-  ☑️ *Nim Version:* `{NimVersion}` 👑
-  ☑️ *OS & CPU:*    `{hostOS.toUpperAscii} {hostCPU.toUpperAscii}` 💻
-  ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
-  ☑️ *Bot uses:*    """
-  temp_folder = getTempDir()
-  strip_cmd   = "strip --strip-all"
-  upx_cmd     = "upx --best --ultra-brute"
-  sha_cmd     = "sha1sum --tag"
-  pub_ip_api  = "https://api.ipify.org"
-  kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
-  doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
-  bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
-  sea_pics    = "https://source.unsplash.com/collection/2160165/99x99" # 480x480
-  ffmpeg_base = r"ffmpeg -loglevel warning -y -an -sn -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 "
-  ffmpeg_blur = r"-vf 'boxblur=luma_radius=min(h\,w)/10:luma_power=1:chroma_radius=min(cw\,ch)/10:chroma_power=1' "
-  ffmpeg_outp = temp_folder / "nim_telegram_bot_webcam.webp"
-  cam_ffmepg_blur = ffmpeg_base & ffmpeg_blur & ffmpeg_outp
-  cam_ffmepg = ffmpeg_base & ffmpeg_outp
-  helps_texts = readFile("help_text.md")      # External *.md files.
-  coc_text =    readFile("coc_text.md")
-  motd_text =   readFile("motd_text.md")
-  donate_text = readFile("donate_text.md")
-  # helps_texts = staticRead("help_text.md")  # Embed the *.md files.
-  # coc_text =    staticRead("coc_text.md")
-  # motd_text =   staticRead("motd_text.md")
-  # donate_text = staticRead("donate_text.md")
-
-let
-  start_time = cpuTime()
-  plugins_folder = getCurrentDir() / "plugins"
-  bash_plugins_folder = plugins_folder / "bash"
-  python_plugins_folder = plugins_folder / "python"
-  static_plugins_folder = plugins_folder / "static"
-  geo_plugins_folder = plugins_folder / "geo"
-  config_ini = loadConfig("config.ini")
-  api_key    = config_ini.getSectionValue("", "api_key")
-  cli_colors = parseBool(config_ini.getSectionValue("", "terminal_colors"))
-  ips2ping = config_ini.getSectionValue("", "ips2ping").split(',')
-  # folders2backup = parseJson(config_ini.getSectionValue("", "folders2backup"))
-
-  file_size_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "size_limit"))
-  file_lineno_limit = parseInt(config_ini.getSectionValue("nim_files_crosscompilation", "lines_limit"))
-  linux_args = config_ini.getSectionValue("nim_files_crosscompilation", "linux_args")
-  windows_args = config_ini.getSectionValue("nim_files_crosscompilation", "windows_args")
-
-  cmd_cat      = parseBool(config_ini.getSectionValue("commands", "cat"))
-  cmd_dog      = parseBool(config_ini.getSectionValue("commands", "dog"))
-  cmd_bigcat   = parseBool(config_ini.getSectionValue("commands", "bigcat"))
-  cmd_sea      = parseBool(config_ini.getSectionValue("commands", "sea"))
-  cmd_coc      = parseBool(config_ini.getSectionValue("commands", "coc"))
-  cmd_motd     = parseBool(config_ini.getSectionValue("commands", "motd"))
-  cmd_help     = parseBool(config_ini.getSectionValue("commands", "help"))
-  cmd_about    = parseBool(config_ini.getSectionValue("commands", "about"))
-  cmd_uptime   = parseBool(config_ini.getSectionValue("commands", "uptime"))
-  cmd_donate   = parseBool(config_ini.getSectionValue("commands", "donate"))
-  cmd_datetime = parseBool(config_ini.getSectionValue("commands", "datetime"))
-  cmd_dollar   = parseBool(config_ini.getSectionValue("commands", "dollar"))
-
-  server_cmd_ip    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
-  server_cmd_df    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
-  server_cmd_free  = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "free"))
-  server_cmd_lshw  = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lshw"))
-  server_cmd_lsusb = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lsusb"))
-  server_cmd_lspci = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "lspci"))
-  server_cmd_public_ip = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "public_ip"))
-
-  oer_api_key = config_ini.getSectionValue("openexchangerates", "api_key")
-  oer_currenc = config_ini.getSectionValue("openexchangerates", "currencies").split(",")
-  oer_round = parseBool(config_ini.getSectionValue("openexchangerates", "round_prices"))
-
-  cam_enabled = parseBool(config_ini.getSectionValue("linux_server_camera", "cam"))
-  cam_blur    = parseBool(config_ini.getSectionValue("linux_server_camera", "blur"))
-  cam_caption = config_ini.getSectionValue("linux_server_camera", "photo_caption")
-  python_plugins = parseBool(config_ini.getSectionValue("", "python_plugins"))
-  api_url = fmt"https://api.telegram.org/file/bot{api_key}/"
-  api_file = fmt"https://api.telegram.org/bot{api_key}/getFile?file_id="
-  polling_interval = int32(parseInt(config_ini.getSectionValue("", "polling_interval")).int8 * 1000)
-  oer_client = AsyncOER(timeout: 3, api_key: oer_api_key, base: "USD", local_base: "",  # "ARS",
-                        round_float: oer_round, prettyprint: false, show_alternative: true)
-
+include ./constants
+include ./variables
 var counter: int
-
 
 proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
   let
@@ -431,10 +345,12 @@ proc main*() {.async.} =
   if ips2ping != @[""]: bot.onCommand("ping", pingHandler(ips2ping))
 
   for static_file in walkFiles(static_plugins_folder / "/*.*"):
+    echo "Loading Static File as a Plugin: " & static_file
     let (dir, name, ext) = splitFile(static_file)
     bot.onCommand(name.toLowerAscii, staticHandler(static_file))
 
   for geo_file in walkFiles(geo_plugins_folder / "/*.ini"):
+    echo "Loading INI File as a GeoLocation Plugin: " & geo_file
     let
       geo_ini = loadConfig(geo_file)
       latitud = parseFloat(geo_ini.getSectionValue("", "latitude"))
@@ -454,12 +370,14 @@ proc main*() {.async.} =
     if cam_enabled: bot.onCommand("cam", camHandler)
 
     for bash_file in walkFiles(bash_plugins_folder / "/*.sh"):
+      echo "Loading Bash Plugin: " & bash_file
       let (dir, name, ext) = splitFile(bash_file)
       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))
 
     if python_plugins:
       discard pyImport("sys").path.append(python_plugins_folder)
       for python_file in walkFiles(python_plugins_folder / "/*.py"):
+        echo "Loading Python Plugin: " & python_file
         let (dir, name, ext) = splitFile(python_file)
         bot.onCommand(name.toLowerAscii, pythonHandler(name))
 
@@ -469,4 +387,4 @@ proc main*() {.async.} =
 
 
 when isMainModule:
-  waitFor(main())
+  wait_for main()
