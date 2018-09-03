@@ -7,8 +7,8 @@ import nimpy              # nimble install nimpy              https://github.com
 # import zip/zipfiles       # nimble install zip
 # import nimprof
 
-include ./constants  ## File with all compile time constants.
-include ./variables  ## File with some of the initial variables.
+include ./constants  # File with all compile time constants.
+include ./variables  # File with some of the initial variables.
 var counter*: int    ## Integer that counts how many times the bot has been used.
 
 proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
@@ -149,68 +149,81 @@ template handlerizerDocument*(body: untyped): untyped =
   discard bot.send(document)
 
 
-proc catHandler(bot: Telebot, update: Command) {.async.} =
+proc catHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message a Random Photo image link of "Kittens". Thumbnail auto provided by Telegram API.
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(kitten_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc dogHandler(bot: Telebot, update: Command) {.async.} =
+proc dogHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message a Random Photo image link of "Puppies". Thumbnail auto provided by Telegram API.
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(doge_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc bigcatHandler(bot: Telebot, update: Command) {.async.} =
+proc bigcatHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message a Random Photo image link of "Big Cats". Thumbnail auto provided by Telegram API.
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(bigcat_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc seaHandler(bot: Telebot, update: Command) {.async.} =
+proc seaHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message a Random Photo image link of "Marine Sea Life". Thumbnail auto provided by Telegram API.
   handlerizer():
     let
       responz = await newAsyncHttpClient(maxRedirects=0).get(sea_pics)
       message = responz.headers["location"].split("?")[0] & "?w=480&h=480&fit=crop"
 
-proc public_ipHandler(bot: Telebot, update: Command) {.async.} =
+proc public_ipHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Public IP Address info of the Server running the bot.
   handlerizer():
     let
       responz = await newAsyncHttpClient().get(pub_ip_api)  # await response
       publ_ip = await responz.body                          # await body
       message = fmt"*Server Public IP Address:* `{publ_ip}`"
 
-proc uptimeHandler(bot: Telebot, update: Command) {.async.} =
+proc uptimeHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Uptime info, includes Bot uptime and Server uptime.
   handlerizer():
     let message = fmt"""⏰ *Uptime:* ⏰
-    Ark Server:   `{execCmdEx("uptime --pretty")[0]}`
+    Server:       `{execCmdEx("uptime --pretty")[0]}`
     Telegram Bot: `{cpuTime() - start_time}`"""
 
-proc datetimeHandler(bot: Telebot, update: Command) {.async.} =
+proc datetimeHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Date and Time of the server running the bot.
   handlerizer():
     let message = $now()
 
-proc aboutHandler(bot: Telebot, update: Command) {.async.} =
+proc aboutHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the About the bot info.
   handlerizer():
     let message = about_texts & $counter
 
-proc helpHandler(bot: Telebot, update: Command) {.async.} =
+proc helpHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the general Help info.
   handlerizer():
     let message = helps_texts
 
-proc cocHandler(bot: Telebot, update: Command) {.async.} =
+proc cocHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Code Of Conduct (AKA Rules).
   handlerizer():
     let message = coc_text
 
-proc donateHandler(bot: Telebot, update: Command) {.async.} =
+proc donateHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Donations info.
   handlerizer():
     let message = donate_text
 
-proc motdHandler(bot: Telebot, update: Command) {.async.} =
+proc motdHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Messade Of The Day.
   handlerizer():
     let message = motd_text
 
-proc dollarHandler(bot: Telebot, update: Command) {.async.} =
+proc dollarHandler*(bot: Telebot, update: Command) {.async.} =
+  ## Sends via chat message the Worldwide exchange prices + Bitcoin price + Gold price.
   let
     money_json = waitFor oer_client.latest()      # Updated Prices.
     names_json = waitFor oer_client.currencies()  # Friendly Names.
@@ -221,7 +234,8 @@ proc dollarHandler(bot: Telebot, update: Command) {.async.} =
   handlerizer():
     let message = dineros
 
-proc geoHandler(latitud, longitud: float,): CommandCallback =
+proc geoHandler*(latitud, longitud: float,): CommandCallback =
+  ## Sends via chat message a GEO URI, An OpenStreetMap link, and Map Thumbnail (GoogleMaps) from INI file from the plugins folder on the server running the bot.
   proc cb(bot: Telebot, update: Command) {.async.} =
     handlerizerLocation():
       let
