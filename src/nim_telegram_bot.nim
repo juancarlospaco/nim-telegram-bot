@@ -11,7 +11,8 @@ include ./constants  # File with all compile time constants.
 include ./variables  # File with some of the initial variables.
 var counter*: int    ## Integer that counts how many times the bot has been used.
 
-proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
+proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
+  ## Handler for all Updates, it does different actions based on the message received.
   let
     url = api_url
     url_getfile = api_file
