@@ -45,6 +45,8 @@ You can hack any of the `*.ini` and `*.md` to customize.
 
 When ever you have the error of missing `*.md` files, you can just use an empty file.
 
+Check the Docs on Nimble!.
+
 
 ## Plugins
 
