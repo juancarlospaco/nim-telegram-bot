@@ -11,6 +11,7 @@ include ./constants  # File with all compile time constants.
 include ./variables  # File with some of the initial variables.
 var counter*: int    ## Integer that counts how many times the bot has been used.
 
+
 proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
   ## Handler for all Updates, it does different simple actions based on the message received.
   let
@@ -24,14 +25,36 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
 
   inc counter
   var response = update.message.get
-#     if response.text.isSome:  # Echo text message.
-#       let
-#         text = response.text.get
-#       var message = newMessage(response.chat.id, text)
-#       message.disableNotification = true
-#       message.replyToMessageId = response.messageId
-#       message.parseMode = "markdown"
-#       discard bot.send(message)
+
+  if response.text.isSome:   # Text Message.
+    let texto = response.text.get.strip
+
+    if texto.toLowerAscii.startsWith("http://") or texto.toLowerAscii.startsWith("https://") and countLines(texto) == 1:  # HTTP URL Link.
+      var message = newMessage(response.chat.id, "⏳ *Processing HTTP URL Link; Please wait!.* ⏳")
+      message.disableNotification = true
+      message.replyToMessageId = response.messageId
+      message.parseMode = "markdown"
+      discard bot.send(message)
+      let
+        temp_file_jpg = temp_folder / "nim_telegram_bot_web_screenshot.jpeg"
+        temp_file_pdf = temp_folder / "nim_telegram_bot_web_screenshot.pdf"
+      var
+        output: string
+        exitCode: int
+      (output, exitCode) = execCmdEx(cutycapt_cmd & "--out=" & temp_file_jpg & " --url=" & texto)
+      echo (output, exitCode)
+      if exitCode == 0:
+        var foti = newPhoto(response.chat.id,  "file://" & temp_file_jpg)
+        foti.caption = texto
+        foti.disableNotification = true
+        discard bot.send(foti)
+      (output, exitCode) = execCmdEx(cutycapt_cmd & "--out=" & temp_file_pdf & " --url=" & texto)
+      if exitCode == 0:
+        var docu = newDocument(response.chat.id, "file://" & temp_file_pdf)
+        docu.caption = texto
+        docu.disableNotification = true
+        discard bot.send(docu)
+
   if response.document.isSome:   # files
     let
       document = response.document.get
@@ -253,14 +276,6 @@ proc staticHandler*(static_file: string): CommandCallback =
         document_caption   = static_file
   return cb
 
-proc pythonHandler*(name: string): CommandCallback =
-  ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
-  proc cb(bot: Telebot, update: Command) {.async.} =
-    let python_output = pyImport(name).main().to(string)
-    handlerizer():
-      let message = python_output
-  return cb
-
 # proc backupHandler(folders: JsonNode): CommandCallback =
 #   proc cb(bot: Telebot, update: Command) {.async.} =
 #     for folder in folders.pairs:
@@ -339,6 +354,14 @@ when defined(linux):
         let message = fmt"""`{execCmdEx(command)[0]}`"""
     return cb
 
+#   proc pythonHandler*(name: string): CommandCallback =
+#     ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
+#     proc cb(bot: Telebot, update: Command) {.async.} =
+#       let python_output = pyImport(name).main().to(string)
+#       handlerizer():
+#         let message = python_output
+#     return cb
+
 
 proc main*() {.async.} =
   ## Main loop of the bot. It instances, init, config, run loop of the Bot.
@@ -404,12 +427,12 @@ proc main*() {.async.} =
       let (dir, name, ext) = splitFile(bash_file)
       bot.onCommand(name.toLowerAscii, cmd_bashHandler(bash_file))
 
-    if python_plugins:
-      discard pyImport("sys").path.append(python_plugins_folder)
-      for python_file in walkFiles(python_plugins_folder / "/*.py"):
-        echo "Loading Python Plugin: " & python_file
-        let (dir, name, ext) = splitFile(python_file)
-        bot.onCommand(name.toLowerAscii, pythonHandler(name))
+#     if python_plugins:
+#       discard pyImport("sys").path.append(python_plugins_folder)
+#       for python_file in walkFiles(python_plugins_folder / "/*.py"):
+#         echo "Loading Python Plugin: " & python_file
+#         let (dir, name, ext) = splitFile(python_file)
+#         bot.onCommand(name.toLowerAscii, pythonHandler(name))
 
     discard nice(19.cint)  # smooth cpu priority
 
