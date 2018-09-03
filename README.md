@@ -66,6 +66,7 @@ the filename will be the command to trigger the plugin, eg `foo.sh` will be `/fo
 output of the script will be sent as string to chat by the bot,
 anything you want the bot to say just print it to standard output.
 Comments are allowed on the SH file.
+File extension is case sensitive, so its `*.sh`, not `*.SH`.
 
 Example Bash plugin:
 
@@ -83,6 +84,7 @@ the return of the `main()` function of the script will be sent as string to chat
 anything you want the bot to say just return it on `main()` as `str` type,
 the `main()` function name is a convention, is hardcoded and can not be changed.
 No other functions are needed on the INI. Comments are allowed on the Python file.
+File extension is case sensitive, so its `*.py`, not `*.PY`.
 
 Example `./plugins/python/foo.py` will be `/foo` on Telegram chat and will call `foo.main()`.
 
@@ -102,6 +104,7 @@ the filename will be the command to trigger the plugin, eg `bar.ini` will be `/b
 Geo Location of the INI will be sent as Map Thumbnail and Open Street Map Link to chat by the bot,
 anything you want the bot to Geo Locate just add `latitude` and `longitude` to the INI.
 No other keys are needed on the INI. Comments are allowed on the INI.
+File extension is case sensitive, so its `*.ini`, not `*.INI`.
 
 Example Geo Location Sharing plugin:
 
@@ -118,6 +121,7 @@ the filename must be all lowercase and not contain whitespaces,
 the filename will be the command to trigger the plugin, eg `baz.jpg` will be `/baz` on Telegram chat,
 the file will be sent as attached Document file to chat by the bot,
 anything you want the bot to share just copy it to that folder.
+File extension is case sensitive, so it must be lower case.
 
 Example Static Files plugin: Any file is Ok.
 
