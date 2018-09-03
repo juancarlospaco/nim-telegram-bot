@@ -1,5 +1,6 @@
 let
   start_time = cpuTime()
+
   plugins_folder* = getCurrentDir() / "plugins"      ## Plugins main folder path, that contains all other subfolder by plugin type.
 
   bash_plugins_folder* = plugins_folder / "bash"     ## Bash Plugins folder path, that contains all ``*.sh`` Bash plugins.
