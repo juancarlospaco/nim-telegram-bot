@@ -16,18 +16,18 @@ let
   linux_args* = config_ini.getSectionValue("nim_files_crosscompilation", "linux_args")                   ## Linux Bash command line extra parameters for CrossCompilation on demand, for target Linux.
   windows_args* = config_ini.getSectionValue("nim_files_crosscompilation", "windows_args")               ## Windows Bash command line extra parameters for CrossCompilation on demand, for target Windows.
 
-  cmd_cat      = parseBool(config_ini.getSectionValue("commands", "cat"))
-  cmd_dog      = parseBool(config_ini.getSectionValue("commands", "dog"))
-  cmd_bigcat   = parseBool(config_ini.getSectionValue("commands", "bigcat"))
-  cmd_sea      = parseBool(config_ini.getSectionValue("commands", "sea"))
-  cmd_coc      = parseBool(config_ini.getSectionValue("commands", "coc"))
-  cmd_motd     = parseBool(config_ini.getSectionValue("commands", "motd"))
-  cmd_help     = parseBool(config_ini.getSectionValue("commands", "help"))
-  cmd_about    = parseBool(config_ini.getSectionValue("commands", "about"))
-  cmd_uptime   = parseBool(config_ini.getSectionValue("commands", "uptime"))
-  cmd_donate   = parseBool(config_ini.getSectionValue("commands", "donate"))
-  cmd_datetime = parseBool(config_ini.getSectionValue("commands", "datetime"))
-  cmd_dollar   = parseBool(config_ini.getSectionValue("commands", "dollar"))
+  cmd_cat*      = parseBool(config_ini.getSectionValue("commands", "cat"))      ## Boolean to Enable/Disable the ``/cat`` chat command.
+  cmd_dog*      = parseBool(config_ini.getSectionValue("commands", "dog"))      ## Boolean to Enable/Disable the ``/dog`` chat command.
+  cmd_bigcat*   = parseBool(config_ini.getSectionValue("commands", "bigcat"))   ## Boolean to Enable/Disable the ``/bigcat`` chat command.
+  cmd_sea*      = parseBool(config_ini.getSectionValue("commands", "sea"))      ## Boolean to Enable/Disable the ``/sea`` chat command.
+  cmd_coc*      = parseBool(config_ini.getSectionValue("commands", "coc"))      ## Boolean to Enable/Disable the ``/coc`` chat command.
+  cmd_motd*     = parseBool(config_ini.getSectionValue("commands", "motd"))     ## Boolean to Enable/Disable the ``/motd`` chat command.
+  cmd_help*     = parseBool(config_ini.getSectionValue("commands", "help"))     ## Boolean to Enable/Disable the ``/help`` chat command.
+  cmd_about*    = parseBool(config_ini.getSectionValue("commands", "about"))    ## Boolean to Enable/Disable the ``/about`` chat command.
+  cmd_uptime*   = parseBool(config_ini.getSectionValue("commands", "uptime"))   ## Boolean to Enable/Disable the ``/uptime`` chat command.
+  cmd_donate*   = parseBool(config_ini.getSectionValue("commands", "donate"))   ## Boolean to Enable/Disable the ``/donate`` chat command.
+  cmd_datetime* = parseBool(config_ini.getSectionValue("commands", "datetime")) ## Boolean to Enable/Disable the ``/datetime`` chat command.
+  cmd_dollar*   = parseBool(config_ini.getSectionValue("commands", "dollar"))   ## Boolean to Enable/Disable the ``/dollar`` chat command.
 
   server_cmd_ip    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "ip"))
   server_cmd_df    = parseBool(config_ini.getSectionValue("linux_server_admin_commands", "df"))
