@@ -9,7 +9,7 @@ import nimpy              # nimble install nimpy              https://github.com
 
 include ./constants  ## File with all compile time constants.
 include ./variables  ## File with some of the initial variables.
-var counter: int
+var counter*: int    ## Integer that counts how many times the bot has been used.
 
 proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
   let
@@ -229,7 +229,8 @@ proc geoHandler(latitud, longitud: float,): CommandCallback =
         longitud = longitud
   return cb
 
-proc staticHandler(static_file: string): CommandCallback =
+proc staticHandler*(static_file: string): CommandCallback =
+  ## Sends via chat message a static file from the plugins folder on the server running the bot.
   proc cb(bot: Telebot, update: Command) {.async.} =
     handlerizerDocument():
       let
@@ -237,7 +238,8 @@ proc staticHandler(static_file: string): CommandCallback =
         document_caption   = static_file
   return cb
 
-proc pythonHandler(name: string): CommandCallback =
+proc pythonHandler*(name: string): CommandCallback =
+  ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
   proc cb(bot: Telebot, update: Command) {.async.} =
     let python_output = pyImport(name).main().to(string)
     handlerizer():
@@ -264,31 +266,38 @@ proc pythonHandler(name: string): CommandCallback =
 
 
 when defined(linux):
-  proc dfHandler(bot: Telebot, update: Command) {.async.} =
+  proc dfHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``df`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("df --human-readable --local --total --print-type")[0]}`"""
 
-  proc freeHandler(bot: Telebot, update: Command) {.async.} =
+  proc freeHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``free`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("free --human --total --giga")[0]}`"""
 
-  proc ipHandler(bot: Telebot, update: Command) {.async.} =
+  proc ipHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``ip`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("ip -brief address")[0]}`"""
 
-  proc lshwHandler(bot: Telebot, update: Command) {.async.} =
+  proc lshwHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``lshw`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("lshw -short")[0]}`"""
 
-  proc lsusbHandler(bot: Telebot, update: Command) {.async.} =
+  proc lsusbHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``lsusb`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("lsusb")[0]}`"""
 
-  proc lspciHandler(bot: Telebot, update: Command) {.async.} =
+  proc lspciHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Executes a ``lspci`` command on the server running the bot and reports results via chat message. Linux only.
     handlerizer():
       let message = fmt"""`{execCmdEx("lspci")[0]}`"""
 
-  proc pingHandler(ips2ping: seq[string]): CommandCallback =
+  proc pingHandler*(ips2ping: seq[string]): CommandCallback =
+    ## Executes a ``ping`` command on the server running the bot and reports results via chat message. Linux only.
     proc cb(bot: Telebot, update: Command) {.async.} =
       var pings_msg = "📡 *Ping results:* 📡 \n"
       for an_ip in ips2ping:
@@ -297,7 +306,8 @@ when defined(linux):
         let message = pings_msg
     return cb
 
-  proc camHandler(bot: Telebot, update: Command) {.async.} =
+  proc camHandler*(bot: Telebot, update: Command) {.async.} =
+    ## Takes 1 Photo using FFMPEG and WebCam with or without Blurr Filter and sends the Photo as chat message. Linux only.
     discard execCmdEx(if cam_blur: cam_ffmepg_blur else: cam_ffmepg)
     let
       path = "file://" & ffmpeg_outp
@@ -307,7 +317,8 @@ when defined(linux):
         photo_path = path
         photo_caption = caption
 
-  proc cmd_bashHandler(command: string,): CommandCallback =
+  proc cmd_bashHandler*(command: string,): CommandCallback =
+    ## Bash plugin handler that executes some command from plugins folder and sends the output as chat message. Linux only.
     proc cb(bot: Telebot, update: Command) {.async.} =
       handlerizer():
         let message = fmt"""`{execCmdEx(command)[0]}`"""
@@ -390,5 +401,4 @@ proc main*() {.async.} =
   bot.poll(polling_interval)
 
 
-when isMainModule:
-  wait_for main()
+when is_main_module: wait_for main()
