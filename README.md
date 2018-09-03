@@ -36,12 +36,15 @@ nim c -r -d:ssl nim_telegram_bot.nim
 
 - Rename the file `config.ini.TEMPLATE` to `config.ini`.
 - Edit the file `config.ini` to set `api_key`, `polling_interval`, etc.
-- Edit the file `coc_text.md` to customize **Code Of Conduct** text.
+- Edit the file `coc_text.md` to customize **Code Of Conduct** text (AKA Rules).
 - Edit the file `motd_text.md` to customize **Message Of The Day** text.
 - Edit the file `help_text.md` to customize **Help** text.
 - Edit the file `donate_text.md` to customize **Donations** text.
 
 You can hack any of the `*.ini` and `*.md` to customize.
+
+When ever you have the error of missing `*.md` files, you can just use an empty file.
+
 
 ## Plugins
 
@@ -62,6 +65,7 @@ the filename must be all lowercase and not contain whitespaces and end with `*.s
 the filename will be the command to trigger the plugin, eg `foo.sh` will be `/foo` on Telegram chat,
 output of the script will be sent as string to chat by the bot,
 anything you want the bot to say just print it to standard output.
+Comments are allowed on the SH file.
 
 Example Bash plugin:
 
@@ -78,6 +82,7 @@ the filename will be the command to trigger the plugin, eg `lol.py` will be `/lo
 the return of the `main()` function of the script will be sent as string to chat by the bot,
 anything you want the bot to say just return it on `main()` as `str` type,
 the `main()` function name is a convention, is hardcoded and can not be changed.
+No other functions are needed on the INI. Comments are allowed on the Python file.
 
 Example `./plugins/python/foo.py` will be `/foo` on Telegram chat and will call `foo.main()`.
 
@@ -95,7 +100,8 @@ def main():
 the filename must be all lowercase and not contain whitespaces and end with `*.ini`,
 the filename will be the command to trigger the plugin, eg `bar.ini` will be `/bar` on Telegram chat,
 Geo Location of the INI will be sent as Map Thumbnail and Open Street Map Link to chat by the bot,
-anything you want the bot to Geo Locate just add latitude and longitude to the INI.
+anything you want the bot to Geo Locate just add `latitude` and `longitude` to the INI.
+No other keys are needed on the INI. Comments are allowed on the INI.
 
 Example Geo Location Sharing plugin:
 
@@ -143,23 +149,32 @@ disable if you expect malware code.
 ./nim_telegram_bot
 ```
 
-The binary executable needs the following files on the same current folder:
+The source code needs the following files on the same current folder to compile:
 
-- `config.ini`
 - `coc_text.md`
 - `motd_text.md`
 - `help_text.md`
 - `donate_text.md`
 
-Example:
+The binary executable needs the following files on the same current folder to run:
+
+- `config.ini`
+
+Example to compile:
 
 ```
-/home/user/bot/nim_telegram_bot
-/home/user/bot/config.ini
+/home/user/bot/nim_telegram_bot.nim
 /home/user/bot/coc_text.md
 /home/user/bot/motd_text.md
 /home/user/bot/help_text.md
 /home/user/bot/donate_text.md
+```
+
+Example to run:
+
+```
+/home/user/bot/nim_telegram_bot
+/home/user/bot/config.ini
 ```
 
 **Optional**, you can use any Linux command like `chrt`, `trickle`, `firejails`, `docker`, `rkt` with the Bot too.
@@ -187,7 +202,7 @@ Example:
 
 **Optional** For Python Plugins:
 
-- `python` (3.6+).
+- `python` (3.7+, older Python versions maybe works but its not supported).
 
 
 ### Single File
