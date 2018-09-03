@@ -7,25 +7,44 @@ const
   ☑️ *Nim Version:* `{NimVersion}` 👑
   ☑️ *OS & CPU:*    `{hostOS.toUpperAscii} {hostCPU.toUpperAscii}` 💻
   ☑️ *Git Repo:*    `http://github.com/juancarlospaco/nim-telegram-bot`
-  ☑️ *Bot uses:*    """
-  temp_folder = getTempDir()
-  strip_cmd   = "strip --strip-all"
-  upx_cmd     = "upx --best --ultra-brute"
-  sha_cmd     = "sha1sum --tag"
-  pub_ip_api  = "https://api.ipify.org"
-  kitten_pics = "https://source.unsplash.com/collection/139386/99x99"  # 480x480
-  doge_pics   = "https://source.unsplash.com/collection/1301659/99x99" # 480x480
-  bigcat_pics = "https://source.unsplash.com/collection/600741/99x99"  # 480x480
-  sea_pics    = "https://source.unsplash.com/collection/2160165/99x99" # 480x480
-  ffmpeg_base = r"ffmpeg -loglevel warning -y -an -sn -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 "
-  ffmpeg_blur = r"-vf 'boxblur=luma_radius=min(h\,w)/10:luma_power=1:chroma_radius=min(cw\,ch)/10:chroma_power=1' "
-  ffmpeg_outp = temp_folder / "nim_telegram_bot_webcam.webp"
-  cam_ffmepg_blur = ffmpeg_base & ffmpeg_blur & ffmpeg_outp
-  cam_ffmepg = ffmpeg_base & ffmpeg_outp
-  helps_texts = readFile("help_text.md")      # External *.md files.
-  coc_text =    readFile("coc_text.md")
-  motd_text =   readFile("motd_text.md")
-  donate_text = readFile("donate_text.md")
+  ☑️ *Bot uses:*    """  ## Info about the Bot itself, version, licence, git, OS, uses, etc.
+
+  temp_folder* = getTempDir()  ## Temporary folder used for temporary files at runtime, etc.
+
+  strip_cmd*  = "strip --strip-all"        ## Linux Bash command to strip the compiled binary executables.
+
+  upx_cmd*    = "upx --best --ultra-brute" ## Linux Bash command to compress the compiled binary executables.
+
+  sha_cmd*    = "sha1sum --tag"            ## Linux Bash command to checksum the compiled binary executables.
+
+  pub_ip_api* = "https://api.ipify.org"    ## Public IP HTTPS URL API.
+
+  kitten_pics* = "https://source.unsplash.com/collection/139386/99x99" ## Random Kittens Photos HTTPS URL.
+
+  doge_pics*  = "https://source.unsplash.com/collection/1301659/99x99" ## Random Puppies Photos HTTPS URL.
+
+  bigcat_pics* = "https://source.unsplash.com/collection/600741/99x99" ## Random Big Cat Photos HTTPS URL.
+
+  sea_pics*   = "https://source.unsplash.com/collection/2160165/99x99" ## Random Sea Life Photos HTTPS URL.
+
+  ffmpeg_base* = r"ffmpeg -loglevel warning -y -an -sn -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 " ## Base incomplete FFMEPG Bash command to take 1 Photo from the Camera at ``/dev/video0``.
+
+  ffmpeg_blur* = r"-vf 'boxblur=luma_radius=min(h\,w)/10:luma_power=1:chroma_radius=min(cw\,ch)/10:chroma_power=1' "   ## FFMEPG Blurr Filter to Blurr the Photos from the Camera at ``/dev/video0``.
+
+  ffmpeg_outp* = temp_folder / "nim_telegram_bot_webcam.webp"  ## Temporary FFMEPG Photo path.
+
+  cam_ffmepg_blur = ffmpeg_base & ffmpeg_blur & ffmpeg_outp   ## Full FFMEPG Bash command to take 1 Photo with Blurr Filter from the Camera at ``/dev/video0``.
+
+  cam_ffmepg = ffmpeg_base & ffmpeg_outp   ## Full FFMEPG Bash command to take 1 Photo from the Camera at ``/dev/video0``.
+
+  helps_texts = readFile("help_text.md")   ## External Mardown file with the message for Help command.
+
+  coc_text    = readFile("coc_text.md")    ## External Mardown file with the message for Code Of Conduct command (AKA Rules).
+
+  motd_text   = readFile("motd_text.md")   ## External Mardown file with the message for Message Of The Day command.
+
+  donate_text = readFile("donate_text.md") ## External Mardown file with the message for Donations command.
+
   # helps_texts = staticRead("help_text.md")  # Embed the *.md files.
   # coc_text =    staticRead("coc_text.md")
   # motd_text =   staticRead("motd_text.md")
