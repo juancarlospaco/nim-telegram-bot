@@ -7,8 +7,8 @@ import nimpy              # nimble install nimpy              https://github.com
 # import zip/zipfiles       # nimble install zip
 # import nimprof
 
-include ./constants
-include ./variables
+include ./constants  ## File with all compile time constants.
+include ./variables  ## File with some of the initial variables.
 var counter: int
 
 proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
@@ -106,6 +106,7 @@ proc handleUpdate(bot: TeleBot, update: Update) {.async.} =
 
 
 template handlerizer(body: untyped): untyped =
+  ## This Template sends a markdown text message from the ``message`` variable.
   inc counter
   body
   var msg = newMessage(update.message.chat.id, $message.strip())
@@ -114,6 +115,7 @@ template handlerizer(body: untyped): untyped =
   discard bot.send(msg)
 
 template handlerizerPhoto(body: untyped): untyped =
+  ## This Template sends a photo image message from the ``photo_path`` variable with the caption comment from ``photo_caption``.
   inc counter
   body
   var msg = newPhoto(update.message.chat.id, photo_path)
@@ -122,6 +124,7 @@ template handlerizerPhoto(body: untyped): untyped =
   discard bot.send(msg)
 
 template handlerizerLocation(body: untyped): untyped =
+  ## This Template sends a Geo Location message from the ``latitud`` and ``longitud`` variables.
   inc counter
   body
   let
@@ -137,6 +140,7 @@ template handlerizerLocation(body: untyped): untyped =
   discard bot.send(msg)
 
 template handlerizerDocument(body: untyped): untyped =
+  ## This Template sends an attached File Document message from the ``document_file_path`` variable with the caption comment from ``document_caption``.
   inc counter
   body
   var document = newDocument(update.message.chat.id, "file://" & document_file_path)
