@@ -4,7 +4,7 @@ import
 import telebot            # nimble install telebot            https://nimble.directory/pkg/telebot
 import openexchangerates  # nimble install openexchangerates  https://github.com/juancarlospaco/nim-openexchangerates
 import nimpy              # nimble install nimpy              https://github.com/yglukhov/nimpy
-# import zip/zipfiles       # nimble install zip
+import zip/zipfiles       # nimble install zip
 # import nimprof
 
 include ./constants  # File with all compile time constants.
@@ -103,6 +103,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
           temp_file_nim = temp_folder / file_tuple.file_name
           temp_file_bin = temp_file_nim.replace(".nim", "")
           temp_file_exe = temp_file_nim.replace(".nim", ".exe")
+          temp_file_html = temp_file_nim.replace(".nim", ".html")
         writeFile(temp_file_nim,  file_tuple.file_content)
         var
           output: string
@@ -129,6 +130,18 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
               var binary_win = newDocument(response.chat.id, "file://" & temp_file_exe)
               binary_win.caption = output.strip
               discard bot.send(binary_win)
+        # HTML Docs.
+        (output, exitCode) = execCmdEx(fmt"nim doc --out:{temp_file_html} {temp_file_nim}")
+        if exitCode == 0:
+          var z: ZipArchive
+          discard z.open(temp_file_html & ".zip", fmWrite)
+          z.addFile(temp_file_html)
+          z.close
+          var html_docs = newDocument(response.chat.id, "file://" & temp_file_html & ".zip")
+          html_docs.caption = "HTML Documentation for " & file_tuple.file_name
+          discard bot.send(html_docs)
+#       if file_name.endsWith(".py"):
+#         echo "Nuitka python to executable" documentacion nim,
       else:
         echo "TODO: Plugins should take it from here, WIP."
     else:
