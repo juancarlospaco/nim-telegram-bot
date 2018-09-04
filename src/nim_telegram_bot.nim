@@ -140,8 +140,26 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
           var html_docs = newDocument(response.chat.id, "file://" & temp_file_html & ".zip")
           html_docs.caption = "HTML Documentation for " & file_tuple.file_name
           discard bot.send(html_docs)
-#       if file_name.endsWith(".py"):
-#         echo "Nuitka python to executable" documentacion nim,
+      if file_name.endsWith(".py"):
+        var
+          output: string
+          exitCode: int
+        let
+          temp_file_py = temp_folder / file_tuple.file_name
+          temp_file_bin = temp_folder / file_tuple.file_name.replace(".py", ".dist") / file_tuple.file_name.replace(".py", "")
+        writeFile(temp_file_py,  file_tuple.file_content)
+        (output, exitCode) = execCmdEx(fmt"{nuitka_cmd}{temp_folder} {temp_file_py}")
+        if exitCode == 0:
+          moveFile(temp_file_bin & ".exe", temp_file_bin)
+          (output, exitCode) = execCmdEx(fmt"{sha_cmd} {temp_file_bin}")
+          if exitCode == 0:
+            var z: ZipArchive
+            discard z.open(temp_file_bin & ".zip", fmWrite)
+            z.addFile(temp_file_bin)
+            z.close
+            var binary_lin = newDocument(response.chat.id, "file://" & temp_file_bin & ".zip")
+            binary_lin.caption = output.strip
+            discard bot.send(binary_lin)
       else:
         echo "TODO: Plugins should take it from here, WIP."
     else:
