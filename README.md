@@ -217,6 +217,10 @@ Example to run:
 - `CutyCapt` http://cutycapt.sourceforge.net
 - `XVFB` for HeadLess Servers without X only, if you have X running is not required.
 
+**Optional** For Python Compilation:
+
+- `nuitka` (Linux package).
+
 
 ### Single File
 
