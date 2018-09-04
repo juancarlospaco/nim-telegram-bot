@@ -91,6 +91,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
       *file_size:* `{file_size}` Bytes _({size_remaining} below limit)_
       *file_linecount:* `{file_linecount}` _({lineno_remaining} below limit)_
       *owner:* {response.chat.first_name.get} {response.chat.last_name.get}
+      *Date & time:* `{$now()}`
       *Powered by:* https://nim-lang.org"""
 
     var message = newMessage(response.chat.id, metadata_text)
