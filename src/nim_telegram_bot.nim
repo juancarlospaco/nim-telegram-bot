@@ -14,6 +14,7 @@ var counter*: int    ## Integer that counts how many times the bot has been used
 
 proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
   ## Handler for all Updates, it does different simple actions based on the message received.
+  inc counter
   let
     url = api_url
     url_getfile = api_file
@@ -22,28 +23,22 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
     strip_cmd = strip_cmd
     upx_cmd = upx_cmd
     sha_cmd = sha_cmd
-
-  inc counter
+    temp_file_jpg = temp_folder / "nim_telegram_bot_web_screenshot.jpg"
+    temp_file_pdf = temp_folder / "nim_telegram_bot_web_screenshot.pdf"
   var response = update.message.get
 
   if response.text.isSome:   # Text Message.
-    let texto = response.text.get.strip
+    let
+      texto = response.text.get.strip.toLowerAscii
+      isurl = countLines(texto) == 1 and ' ' notin texto
 
-    if texto.toLowerAscii.startsWith("http://") or texto.toLowerAscii.startsWith("https://") and countLines(texto) == 1:  # HTTP URL Link.
-      var message = newMessage(response.chat.id, "⏳ *Processing HTTP URL Link; Please wait!.* ⏳")
-      message.disableNotification = true
-      message.replyToMessageId = response.messageId
-      message.parseMode = "markdown"
-      discard bot.send(message)
-      let
-        temp_file_jpg = temp_folder / "nim_telegram_bot_web_screenshot.jpg"
-        temp_file_pdf = temp_folder / "nim_telegram_bot_web_screenshot.pdf"
+    if texto.startsWith("http://") or texto.startsWith("https://") and isurl:  # HTTP URL Link.
       var
         output: string
         exitCode: int
       (output, exitCode) = execCmdEx(cutycapt_cmd & "--out=" & temp_file_jpg & " --url=" & texto)
       if exitCode == 0:
-        var foti = newPhoto(response.chat.id,  "file://" & temp_file_jpg)
+        var foti = newDocument(response.chat.id, "file://" & temp_file_jpg)
         foti.caption = texto
         foti.disableNotification = true
         discard bot.send(foti)
@@ -53,6 +48,21 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
         docu.caption = texto
         docu.disableNotification = true
         discard bot.send(docu)
+    elif texto.startsWith("geo:") and ',' in texto and isurl:  # GEO URI.
+      let
+        geo_seq = texto.replace("geo:", "").split(',')
+        latitud =  parseFloat(geo_seq[0])
+        longitud = parseFloat(geo_seq[1])
+        geo_uri = "*GEO URI:* geo:$1,$2    ".format(latitud, longitud)
+        osm_url = "*OSM URL:* https://www.openstreetmap.org/?mlat=$1&mlon=$2".format(latitud, longitud)
+      var
+        msg = newMessage(response.chat.id,  geo_uri & osm_url)
+        geo_msg = newLocation(response.chat.id, longitud, latitud)
+      msg.disableNotification = true
+      geo_msg.disableNotification = true
+      msg.parseMode = "markdown"
+      discard bot.send(geo_msg)
+      discard bot.send(msg)
 
   if response.document.isSome:   # files
     let
@@ -275,6 +285,14 @@ proc staticHandler*(static_file: string): CommandCallback =
         document_caption   = static_file
   return cb
 
+proc pythonHandler*(name: string): CommandCallback =
+  ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
+  proc cb(bot: Telebot, update: Command) {.async.} =
+    let python_output = pyImport(name).main().to(string)
+    handlerizer():
+      let message = python_output
+  return cb
+
 # proc backupHandler(folders: JsonNode): CommandCallback =
 #   proc cb(bot: Telebot, update: Command) {.async.} =
 #     for folder in folders.pairs:
@@ -351,14 +369,6 @@ when defined(linux):
     proc cb(bot: Telebot, update: Command) {.async.} =
       handlerizer():
         let message = fmt"""`{execCmdEx(command)[0]}`"""
-    return cb
-
-  proc pythonHandler*(name: string): CommandCallback =
-    ## Imports, wraps and executes a ``*.py`` Python plugin on the server running the bot and reports results via chat message.
-    proc cb(bot: Telebot, update: Command) {.async.} =
-      let python_output = pyImport(name).main().to(string)
-      handlerizer():
-        let message = python_output
     return cb
 
 
