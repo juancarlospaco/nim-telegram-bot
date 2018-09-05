@@ -1,4 +1,4 @@
-version     = "0.4.0"
+version     = "0.4.5"
 author      = "Juan Carlos"
 description = "Generic Configurable Async Telegram Bot for Nim with builtin basic functionality and Plugins."
 license     = "MIT"
