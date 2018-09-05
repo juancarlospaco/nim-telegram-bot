@@ -19,6 +19,14 @@ let
 
   ips2ping* = config_ini.getSectionValue("", "ips2ping").split(',')          ## List of IP to ping when the ``/ping`` command is used on the chat.
 
+  web_screenshots* = parseBool(config_ini.getSectionValue("", "web_screenshots"))  ## Boolean to Enable/Disable the HTTP URL Web Link to Screenshot feature.
+
+  geo_uris* = parseBool(config_ini.getSectionValue("", "geo_uris"))  ## Boolean to Enable/Disable the GEO URI Link to Map Thumbnail feature.
+
+  crosscompilations* = parseBool(config_ini.getSectionValue("", "crosscompilations"))  ## Boolean to Enable/Disable the Nim Source Code Crosscompilation feature.
+
+  py_compilations* = parseBool(config_ini.getSectionValue("", "py_compilations"))  ## Boolean to Enable/Disable the Python Source Code compilation feature.
+
   # folders2backup = parseJson(config_ini.getSectionValue("", "folders2backup"))
 
 
