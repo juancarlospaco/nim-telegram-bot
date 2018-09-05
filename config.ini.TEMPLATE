@@ -8,6 +8,14 @@ terminal_colors = true
 python_plugins = true
 # IPs / Hostnames to ping (comma separated, empty string = disabled).
 ips2ping = "127.0.0.1,::1"
+# Enable/Disable the HTTP URL Web Link to Screenshot feature.
+web_screenshots = true
+# Enable/Disable the GEO URI Link to Map Thumbnail feature.
+geo_uris = true
+# Enable/Disable the Nim Source Code Crosscompilation feature.
+crosscompilations = true
+# Enable/Disable the Python Source Code Compilation feature.
+py_compilations = true
 
 
 [openexchangerates]
