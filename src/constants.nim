@@ -1,6 +1,6 @@
 const
   about_texts = fmt"""*Nim Telegram Bot* 🤖
-  ☑️ *Version:*     `0.4.0` 👾
+  ☑️ *Version:*     `0.4.5` 👾
   ☑️ *Licence:*     MIT 👽
   ☑️ *Author:*      _Juan Carlos_ @juancarlospaco 😼
   ☑️ *Compiled:*    `{CompileDate} {CompileTime}` ⏰
