@@ -32,7 +32,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
       texto = response.text.get.strip.toLowerAscii
       isurl = countLines(texto) == 1 and ' ' notin texto
 
-    if texto.startsWith("http://") or texto.startsWith("https://") and isurl:  # HTTP URL Link.
+    if texto.startsWith("http://") or texto.startsWith("https://") and isurl and web_screenshots:  # HTTP URL Link.
       var
         output: string
         exitCode: int
@@ -48,7 +48,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
         docu.caption = texto
         docu.disableNotification = true
         discard bot.send(docu)
-    elif texto.startsWith("geo:") and ',' in texto and isurl:  # GEO URI.
+    elif texto.startsWith("geo:") and ',' in texto and isurl and geo_uris:  # GEO URI.
       let
         geo_seq = texto.replace("geo:", "").split(',')
         latitud =  parseFloat(geo_seq[0])
@@ -100,7 +100,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
     discard bot.send(message)
 
     if size_remaining > 1 and lineno_remaining > 1:
-      if file_name.endsWith(".nim"):
+      if file_name.endsWith(".nim") and crosscompilations:
         let
           temp_file_nim = temp_folder / file_tuple.file_name
           temp_file_bin = temp_file_nim.replace(".nim", "")
@@ -142,7 +142,7 @@ proc handleUpdate*(bot: TeleBot, update: Update) {.async.} =
           var html_docs = newDocument(response.chat.id, "file://" & temp_file_html & ".zip")
           html_docs.caption = "HTML Documentation for " & file_tuple.file_name
           discard bot.send(html_docs)
-      if file_name.endsWith(".py"):
+      if file_name.endsWith(".py") and py_compilations:
         var
           output: string
           exitCode: int
